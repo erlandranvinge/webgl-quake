@@ -1,5 +1,3 @@
-var test = require('/lib/gl-matrix-min');
-
 
 var gl = function() {};
 
