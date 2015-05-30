@@ -7,7 +7,8 @@ gulp.task('default', function() {
 
         var options = {
             paths: ['./js'],
-            insertGlobals: false,
+            insertGlobals: true,
+            //insertGlobalVars: 'Buffer',
             debug: true
         };
 

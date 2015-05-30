@@ -2,6 +2,7 @@
 var gl = require('gl/gl');
 var settings = require('settings');
 var Console = require('./console');
+var Pak = require('./pak');
 
 if (!window.requestFrame) {
     window.requestFrame = ( function() {
@@ -27,6 +28,8 @@ Quake.prototype.tick = function() {
 };
 
 Quake.prototype.start = function() {
+    var pak = new Pak('data/pak0.pak');
+
     gl.init('canvas');
     this.tick();
 };
