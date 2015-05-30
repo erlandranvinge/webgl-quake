@@ -3,9 +3,6 @@ var glMatrix = require('lib/gl-matrix-min.js');
 var gl = function() {};
 
 gl.init = function(id) {
-    window.vec2 = glMatrix.vec2;
-    window.vec3 = glMatrix.vec3;
-    window.mat4 = glMatrix.mat4;
 
     var canvas = document.getElementById(id);
     if (!canvas)
@@ -23,7 +20,11 @@ gl.init = function(id) {
     gl.depthFunc(gl.LEQUAL);
     gl.cullFace(gl.FRONT);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    return gl;
+
+    window.vec2 = glMatrix.vec2;
+    window.vec3 = glMatrix.vec3;
+    window.mat4 = glMatrix.mat4;
+    window.gl = gl;
 };
 
 module.exports = exports = gl;

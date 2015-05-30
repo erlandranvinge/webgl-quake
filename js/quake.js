@@ -1,7 +1,7 @@
 
 var gl = require('gl/gl');
-var con = require('console');
 var settings = require('settings');
+var Console = require('./console');
 
 if (!window.requestFrame) {
     window.requestFrame = ( function() {
@@ -16,16 +16,19 @@ if (!window.requestFrame) {
     })();
 }
 
-Quake = {};
-
-Quake.tick = function() {
-    // requestFrame(Quake.tick);
-
+Quake = function() {
+    this.con = new Console();
 };
 
-Quake.start = function() {
+Quake.prototype.tick = function() {
+    // requestFrame(Quake.tick);
+
+    this.con.draw();
+};
+
+Quake.prototype.start = function() {
     gl.init('canvas');
-    Quake.tick();
+    this.tick();
 };
 
 

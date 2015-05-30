@@ -1,6 +1,8 @@
 
-var Con = function() {
+var Console = function() {};
 
+Console.prototype.draw = function() {
+   console.log(gl);
 };
 
-module.exports = exports = Con;
+module.exports = exports = Console;
