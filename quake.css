@@ -1,0 +1,12 @@
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+}
+
+canvas {
+    /*cursor: none;*/
+    width: 100%;/*640px;*/
+    height: 100%; /*400px;*/
+}
