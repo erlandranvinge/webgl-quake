@@ -6,9 +6,11 @@ gulp.task('default', function() {
     watch('js/**/*.js', function() {
 
         var options = {
+            paths: ['./js'],
             insertGlobals: false,
             debug: true
         };
+
         gulp.src('js/quake.js')
             .pipe(browserify(options))
             .pipe(gulp.dest('./'));
