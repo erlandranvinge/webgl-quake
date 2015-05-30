@@ -9,10 +9,11 @@ gl.init = function(id) {
 
     var canvas = document.getElementById(id);
     if (!canvas)
-        throw 'Error: No canvas found.';
+        throw 'Error: No canvas element found.';
 
-    var context = canvas.getContext('webgl', options);
-    if (!context)
+    var options = {};
+    var gl = canvas.getContext('webgl', options);
+    if (!gl)
         throw 'Error: No WebGL support found.';
 
     gl.width = canvas.width;
@@ -21,6 +22,7 @@ gl.init = function(id) {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.depthFunc(gl.LEQUAL);
     gl.cullFace(gl.FRONT);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     return gl;
 };
 
