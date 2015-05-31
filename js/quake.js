@@ -1,6 +1,7 @@
 
 var webgl = require('gl/gl');
 var assets = require('assets');
+var Map = require('map');
 var Console = require('./console');
 
 if (!window.requestFrame) {
@@ -44,7 +45,8 @@ Quake.prototype.start = function() {
     assets.precache(function() {
         self.console = new Console();
 
-        var map = assets.load('pak/maps/start.bsp');
+        var bsp = assets.load('pak/maps/start.bsp');
+        var map = new Map(bsp);
 
         tick();
     });

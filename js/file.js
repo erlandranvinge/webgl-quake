@@ -6,7 +6,7 @@ var File = function(data) {
 };
 
 File.prototype.tell = function() {
-    return offset;
+    return this.offset;
 };
 
 File.prototype.seek = function(offset) {
@@ -23,9 +23,11 @@ File.prototype.slice = function(offset, length) {
 
 File.prototype.readString = function(length) {
     var result = '';
+    var terminated = false;
     for (var i = 0; i < length; i++) {
         var byte = this.buffer.readUInt8(this.offset);
-        if (byte !== 0)
+        if (byte === 0x0) terminated = true;
+        if (!terminated)
             result += String.fromCharCode(byte);
         this.offset++;
     }

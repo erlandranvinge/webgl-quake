@@ -76,7 +76,6 @@ Assets.prototype.load = function(name, options) {
         case 'bsp':
             var data = this.pak.load(name);
             return new Bsp(data);
-
     }
 
     options.palette = this.palette;
@@ -106,5 +105,4 @@ Assets.prototype.precache = function(done) {
         });
     }
 };
-
 module.exports = exports = new Assets();

@@ -1,6 +1,6 @@
 
 var Bsp = function(file) {
-    this.header = {
+    var header = {
         version: file.readInt32(),
         entities: {offset: file.readInt32(), size: file.readInt32()},
         planes: {offset: file.readInt32(), size: file.readInt32()},
@@ -24,10 +24,24 @@ var Bsp = function(file) {
 
 Bsp.prototype.loadTextures = function(file, lump) {
     file.seek(lump.offset);
-    var textureCount = reader.readInt32();
-    this.textures = [];
+    var textureCount = file.readInt32();
 
-    console.log(textureCount);
+    this.textures = [];
+    for (var i = 0; i < textureCount; i++) {
+        var textureOffset = file.readInt32();
+        var originalOffset = file.tell();
+        file.seek(lump.offset + textureOffset);
+        var texture = {
+            name: file.readString(16),
+            width: file.readUInt32(),
+            height: file.readUInt32(),
+        };
+        var offset = lump.offset + textureOffset + file.readUInt32();
+        texture.data = file.slice(offset, texture.width * texture.height);
+        this.textures.push(texture);
+
+        file.seek(originalOffset);
+    }
 };
 
 module.exports = exports = Bsp;
