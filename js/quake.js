@@ -1,7 +1,7 @@
 
 var gl = require('gl/gl');
 var Console = require('./console');
-var Pak = require('./pak');
+var Pak = require('formats/pak');
 var utils = require('utils');
 
 if (!window.requestFrame) {
