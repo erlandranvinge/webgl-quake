@@ -1,4 +1,5 @@
 var File = require('file');
+var Wad = require('wad');
 
 var Pak = function(data) {
     var file = new File(data);
@@ -20,6 +21,7 @@ var Pak = function(data) {
     console.log('PAK: Loaded %i entries.', indexFileCount);
 
     this.file = file;
+    this.wad = new Wad(this.load('gfx.wad'));
 };
 
 Pak.prototype.load = function(name) {

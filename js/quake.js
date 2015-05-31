@@ -1,9 +1,7 @@
 
 var gl = require('gl/gl');
-var settings = require('settings');
 var Console = require('./console');
 var Pak = require('./pak');
-var Wad = require('wad');
 var utils = require('utils');
 
 if (!window.requestFrame) {
@@ -19,26 +17,22 @@ if (!window.requestFrame) {
     })();
 }
 
-Quake = function() {
-    this.con = new Console();
-};
+Quake = function() {};
 
 Quake.prototype.tick = function() {
     // requestFrame(Quake.tick);
-
-    this.con.draw();
+    this.console.draw();
 };
 
 Quake.prototype.start = function() {
+    gl.init('canvas');
+
+    var self = this;
     var data = utils.download('data/pak0.pak', function(data) {
         var pak = new Pak(data);
-        var wad = new Wad(pak.load('gfx.wad'));
-
-
+        self.console = new Console(pak);
+        self.tick();
     });
-
-    gl.init('canvas');
-    this.tick();
 };
 
 

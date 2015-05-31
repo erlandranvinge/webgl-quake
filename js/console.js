@@ -1,5 +1,8 @@
 
-var Console = function() {};
+var Console = function(pak) {
+
+
+};
 
 Console.prototype.draw = function() {
    console.log(gl);
