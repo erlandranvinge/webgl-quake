@@ -58,8 +58,6 @@ Bsp.prototype.loadSurfaceEdges = function(file, lump) {
     }
 };
 
-
-
 Bsp.prototype.loadSurfaces = function (file, lump) {
 
     var surfaceCount = lump.size / 20;
@@ -114,7 +112,7 @@ Bsp.prototype.loadTextures = function(file, lump) {
 Bsp.prototype.loadTexInfos = function(file, lump) {
     file.seek(lump.offset);
     var texInfoCount = lump.size / 40;
-    this.texInfos = []
+    this.texInfos = [];
     for (var i = 0; i < texInfoCount; i++) {
         var info = {};
         info.vectorS = [file.readFloat(), file.readFloat(), file.readFloat()];

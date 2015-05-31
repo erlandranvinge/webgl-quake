@@ -5,22 +5,27 @@ var wireframe = false;
 
 var Map = function(bsp) {
     this.textures = [];
-    for (var i in bsp.textures) {
-        var texture = bsp.textures[i];
-        var options = { width: texture.width, height: texture.height, palette: assets.palette };
+    for (var texId in bsp.textures) {
+        var texture = bsp.textures[texId];
+        var options = {
+            width: texture.width,
+            height: texture.height,
+            wrap: gl.REPEAT,
+            palette: assets.palette
+        };
         this.textures.push(new Texture(texture.data, options));
     }
 
     var chains = [];
     for (var m in bsp.models) {
         var model = bsp.models[m];
-        for (var s = model.firstSurface; s < model.surfaceCount; s++) {
-            var surface = bsp.surfaces[s];
+        for (var sid = model.firstSurface; sid < model.surfaceCount; sid++) {
+            var surface = bsp.surfaces[sid];
             var texInfo = bsp.texInfos[surface.texInfoId];
 
             var chain = chains[texInfo.textureId];
             if (!chain) {
-                chain = { textureId: texInfo.textureId, data: [] };
+                chain = { texId: texInfo.textureId, data: [] };
                 chains[texInfo.textureId] = chain;
             }
 
@@ -38,24 +43,42 @@ var Map = function(bsp) {
             }
             indices = wireframe ? indices : utils.triangulate(indices);
             for (var i = 0; i < indices.length; i++) {
-                chain.data.push(bsp.vertices[indices[i]].x);
-                chain.data.push(bsp.vertices[indices[i]].y);
-                chain.data.push(bsp.vertices[indices[i]].z);
+                var v = [
+                    bsp.vertices[indices[i]].x,
+                    bsp.vertices[indices[i]].y,
+                    bsp.vertices[indices[i]].z
+                ];
+
+                var s = vec3.dot(v, texInfo.vectorS) + texInfo.distS;
+                var t = vec3.dot(v, texInfo.vectorT) + texInfo.distT;
+
+                var s1 = s / this.textures[texInfo.textureId].width;
+                var t1 = t / this.textures[texInfo.textureId].height;
+
+                chain.data.push(v[0], v[1], v[2], s1, t1);
             }
         }
     }
 
     var data = [];
+    var offset = 0;
+    this.chains = [];
     for (var c in chains) {
         for (var v = 0; v < chains[c].data.length; v++) {
             data.push(chains[c].data[v]);
         }
+        var chain = {
+            offset: offset,
+            texId: chains[c].texId,
+            elements: chains[c].data.length / 5
+        };
+        offset += chain.elements;
+        this.chains.push(chain);
     }
     this.buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
-    this.buffer.stride = 3 * 4;
-    this.buffer.elements = data.length / 3;
+    this.buffer.stride = 5 * 4;
 };
 
 Map.prototype.draw = function(p, m) {
@@ -65,13 +88,18 @@ Map.prototype.draw = function(p, m) {
 
     shader.use();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-    gl.disableVertexAttribArray(1);
-
     gl.vertexAttribPointer(shader.attributes.vertexAttribute, 3, gl.FLOAT, false, buffer.stride, 0);
+    gl.vertexAttribPointer(shader.attributes.texCoordsAttribute, 2, gl.FLOAT, false, buffer.stride, 12);
+
     gl.uniformMatrix4fv(shader.uniforms.projectionMatrix, false, p);
     gl.uniformMatrix4fv(shader.uniforms.modelviewMatrix, false, m);
 
-    gl.drawArrays(mode, 0, buffer.elements);
+    for (var c in this.chains) {
+        var chain = this.chains[c];
+        var texture = this.textures[chain.texId];
+        gl.bindTexture(gl.TEXTURE_2D, texture.id);
+        gl.drawArrays(mode, this.chains[c].offset, this.chains[c].elements);
+    }
 };
 
 module.exports = exports = Map;

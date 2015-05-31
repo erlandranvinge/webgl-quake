@@ -3,7 +3,7 @@ var webgl = require('gl/gl');
 var assets = require('assets');
 var utils = require('utils');
 var Map = require('map');
-var Console = require('console');
+var Console = require('./console');
 var Input = require('input');
 
 if (!window.requestFrame) {
@@ -26,6 +26,9 @@ var tick = function() {
 
 Quake = function() {};
 
+var angle = 0;
+var position = [0, 0, 0];
+
 Quake.prototype.tick = function() {
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -35,9 +38,23 @@ Quake.prototype.tick = function() {
     gl.enable(gl.BLEND);
     //this.console.draw(this.ortho);
 
-    var m = utils.quakeIdentity(mat4.create());
 
+    gl.enable(gl.DEPTH_TEST);
+    var m = utils.quakeIdentity(mat4.create());
     mat4.translate(m, m, [100, 100, -20]);
+    mat4.translate(m, m, position);
+
+    if (this.input.left)
+        angle += 0.04;
+    if (this.input.right)
+        angle -= 0.04;
+    if (this.input.up)
+        position[0] -= 10;
+    if (this.input.down)
+        position[0] += 10;
+
+
+    mat4.rotateZ(m, m, angle);
     this.map.draw(this.projection, m);
 };
 
@@ -46,7 +63,6 @@ Quake.prototype.start = function() {
     webgl.init('canvas');
     this.ortho = mat4.ortho(mat4.create(), 0, gl.width, gl.height, 0, -10, 10);
     this.projection = mat4.perspective(mat4.create(), 68.03, gl.width / gl.height, 0.1, 4096);
-
 
     assets.add('data/pak0.pak');
     assets.add('shaders/color2d.shader');
