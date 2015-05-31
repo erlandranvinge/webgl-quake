@@ -1,8 +1,9 @@
-var Pak = require('formats/pak');
-var Wad = require('formats/wad');
 var Shader = require('gl/shader');
 var Texture = require('gl/texture');
+var Pak = require('formats/pak');
+var Wad = require('formats/wad');
 var Palette = require('formats/palette');
+var Bsp = require('formats/bsp');
 
 function getExtension(path) {
     var index = path.lastIndexOf('.');
@@ -66,12 +67,20 @@ Assets.prototype.insert = function(item, data) {
 
 Assets.prototype.load = function(name, options) {
     var index = name.indexOf('/');
-    var type = name.substr(0, index);
+    var location = name.substr(0, index);
+    var type = getExtension(name) || 'texture';
     var name = name.substr(index + 1);
-
     var options = options || {};
+
+    switch (type) {
+        case 'bsp':
+            var data = this.pak.load(name);
+            return new Bsp(data);
+
+    }
+
     options.palette = this.palette;
-    switch(type) {
+    switch(location) {
         case 'pak':
             var data = this.pak.load(name);
             return new Texture(data, options);

@@ -3,6 +3,11 @@ var browserify = require('gulp-browserify');
 var watch = require('gulp-watch');
 var connect = require('gulp-connect');
 
+function swallowError (error) {
+   console.log(error.toString());
+    this.emit('end');
+}
+
 gulp.task('connect', function() {
     connect.server({
         root: '',
@@ -22,6 +27,7 @@ gulp.task('watch', function() {
 
         gulp.src('js/quake.js')
             .pipe(browserify(options))
+            .on('error', swallowError)
             .pipe(gulp.dest('./'))
             .pipe(connect.reload());
         console.log('Bundle complete!');

@@ -42,4 +42,10 @@ File.prototype.readUInt32 = function() {
     return result;
 };
 
+File.prototype.readInt32 = function() {
+    var result = this.buffer.readInt32LE(this.offset);
+    this.offset += 4;
+    return result;
+};
+
 module.exports = exports = File;

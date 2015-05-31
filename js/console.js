@@ -17,10 +17,8 @@ var Console = function() {
    background.textures.addSubTexture(backgroundTexture);
    background.textures.compile(assets.shaders.texture2d);
 
-
    this.font = font;
    this.background = background;
-
    console.log(fontTexture.asDataUrl());
 };
 
@@ -29,11 +27,10 @@ Console.prototype.print = function(msg) {
 };
 
 Console.prototype.draw = function(p) {
+
    this.background.clear();
    this.background.drawSprite(0, 0, 0, gl.width, gl.height, 1, 1, 1, 1.0);
    this.background.render(assets.shaders.color2d, p);
-
-   this.print("AAAAAAaaaaa");
 
    gl.enable(gl.BLEND);
    this.font.render(assets.shaders.texture2d, p);

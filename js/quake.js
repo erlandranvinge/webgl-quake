@@ -16,7 +16,6 @@ if (!window.requestFrame) {
     })();
 }
 
-// TODO: Bridge between browser ticks and quake instance needs to get cleaner.
 var tick = function() {
     //requestFrame(tick);
     Quake.instance.tick();
@@ -44,6 +43,9 @@ Quake.prototype.start = function() {
     var self = this;
     assets.precache(function() {
         self.console = new Console();
+
+        var map = assets.load('pak/maps/start.bsp');
+
         tick();
     });
 };
