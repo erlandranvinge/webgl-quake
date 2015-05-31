@@ -9,6 +9,9 @@ var Texture = function(file, options) {
     if (!options.width || !options.height) {
         options.width = file.readUInt32();
         options.height = file.readUInt32();
+    }
+
+    if (file) {
         var pixels = options.palette.apply(file, options.width, options.height);
     }
 
@@ -50,11 +53,13 @@ Texture.prototype.drawTo = function (callback) {
         Texture.renderBuffer.height = this.height;
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width, this.height);
     }
+
+
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.id, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, Texture.renderBuffer);
     gl.viewport(0, 0, this.width, this.height);
 
-    var projectionMatrix = mat4.ortho(mat4.create(), 0, this.width, 0, this.height, -99999, 99999);
+    var projectionMatrix = mat4.ortho(mat4.create(), 0, this.width, 0, this.height, -10, 10);
     callback(projectionMatrix);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);

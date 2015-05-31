@@ -10,14 +10,15 @@ var Palette = function(file) {
     }
 };
 
-Palette.prototype.apply = function(data, width, height) {
+Palette.prototype.apply = function(data, width, height, alpha) {
     var pixels = new Uint8Array(4 * width * height);
     for (var i = 0; i < width * height; i++) {
-        var color = this.colors[data.readUInt8()];
+        var index = data.readUInt8();
+        var color = this.colors[index];
         pixels[i*4] = color.r;
         pixels[i*4+1] = color.g;
         pixels[i*4+2] = color.b;
-        pixels[i*4+3] = 255;
+        pixels[i*4+3] = (alpha && !index) ? 0 : 255;
     }
     return pixels;
 };

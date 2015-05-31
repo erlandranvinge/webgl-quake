@@ -98,4 +98,4 @@ Assets.prototype.precache = function(done) {
     }
 };
 
-module.exports = exports = Assets;
+module.exports = exports = new Assets();

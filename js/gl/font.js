@@ -19,8 +19,9 @@ Font.prototype.addVertex = function(x, y, u, v) {
 };
 
 Font.prototype.drawCharacter = function(x, y, index) {
-    if (index == 32 || y < 0 || x < 0 || x > renderer.width || y > renderer.height)
+    if (index == 32 || y < 0 || x < 0 || x > gl.width || y > gl.height)
         return;
+
     index &= 255;
     var row = index >> 4;
     var column = index & 15;
@@ -38,11 +39,9 @@ Font.prototype.drawCharacter = function(x, y, index) {
     this.elementCount += 6;
 };
 
-Font.prototype.drawString = function(x, y, str, immediate) {
+Font.prototype.drawString = function(x, y, str) {
     for (var i = 0; i < str.length; i++)
         this.drawCharacter(x + ((i + 1) << 3), y, str.charCodeAt(i));
-    if (immediate === true)
-        this.commit();
 };
 
 Font.prototype.render = function(shader, p) {
