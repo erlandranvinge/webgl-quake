@@ -30,24 +30,27 @@ Quake.prototype.tick = function() {
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.BLEND);
     this.console.draw(this.ortho);
+
+
+
 };
 
 Quake.prototype.start = function() {
     Quake.instance = this;
     webgl.init('canvas');
     this.ortho = mat4.ortho(mat4.create(), 0, gl.width, gl.height, 0, -10, 10);
+    this.projection = mat4.perspective(mat4.create(), 68.03, 4096);
 
     assets.add('data/pak0.pak');
     assets.add('shaders/color2d.shader');
     assets.add('shaders/texture2d.shader');
+    assets.add('shaders/world.shader');
 
     var self = this;
     assets.precache(function() {
         self.console = new Console();
-
         var bsp = assets.load('pak/maps/start.bsp');
-        var map = new Map(bsp);
-
+        self.map = new Map(bsp);
         tick();
     });
 };

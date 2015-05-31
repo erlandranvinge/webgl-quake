@@ -3,13 +3,12 @@ var assets = require('assets');
 var utils = require('utils');
 
 var Map = function(bsp, wireframe) {
-    this.textures = {};
+    this.textures = [];
     for (var i in bsp.textures) {
         var texture = bsp.textures[i];
         var options = { width: texture.width, height: texture.height, palette: assets.palette };
-        this.textures[texture.name] = new Texture(texture.data, options);
+        this.textures.push(new Texture(texture.data, options));
     }
-
 
     var chains = [];
     for (var m in bsp.models) {
@@ -20,11 +19,7 @@ var Map = function(bsp, wireframe) {
 
             var chain = chains[texInfo.textureId];
             if (!chain) {
-                chain = {
-                    textureId: texInfo.textureId,
-                    vertices: [],
-                    flags: surface.flags
-                };
+                chain = { textureId: texInfo.textureId, data: [] };
                 chains[texInfo.textureId] = chain;
             }
 
@@ -41,52 +36,29 @@ var Map = function(bsp, wireframe) {
                 }
             }
             indices = wireframe ? indices : utils.triangulate(indices);
-
-            for (var j = indices.length - 1; j >= 0; j--) { // Do backwards, to allow correct back-face culling.
-                var v = [
-                    bsp.vertices[indices[j] * 3],
-                    bsp.vertices[indices[j] * 3 + 1],
-                    bsp.vertices[indices[j] * 3 + 2]
-                ];
-
-                // Add coordinates
-                chain.vertices.push(v[0]);
-                chain.vertices.push(v[1]);
-                chain.vertices.push(v[2]);
-
-                // Add tex-coords
-                var s = vec3.dot(v, texInfo.vectorS) + texInfo.distS;
-                var t = vec3.dot(v, texInfo.vectorT) + texInfo.distT;
-
-                var s1 = s / bsp.textures[texInfo.textureId].width;
-                var t1 = t / bsp.textures[texInfo.textureId].height;
-                chain.vertices.push(s1);
-                chain.vertices.push(t1);
-
-
-                chain.vertices.push(0);
-                chain.vertices.push(0);
-                /*
-
-
-                // Shadow map texture coordinates
-                var s2 = s;
-                s2 -= surface.textureMins[0];
-                s2 += (surface.lightMapS * 16);
-                s2 += 8;
-                s2 /= (Bsp.BLOCK_WIDTH * 16);
-
-                var t2 = t;
-                t2 -= surface.textureMins[1];
-                t2 += (surface.lightMapT * 16);
-                t2 += 8;
-                t2 /= (Bsp.BLOCK_HEIGHT * 16);
-
-                chain.vertices.push(s2);
-                chain.vertices.push(t2);*/
+            for (var i = 0; i < indices.length; i+= 3) {
+                chain.data.push(bsp.vertices[indices[i]]);
+                chain.data.push(bsp.vertices[indices[i+1]]);
+                chain.data.push(bsp.vertices[indices[i+2]]);
+                chain.data.push(0, 0, 0, 0);
             }
         }
     }
+
+    var data = [];
+    for (var c in chains) {
+        for (var v = 0; v < chains[c].data.length; v++) {
+            data.push(chains[c].data[v]);
+        }
+    }
+    this.buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+    this.buffer.stride = 7 * 4;
+};
+
+Map.prototype.draw = function(p) {
+
 };
 
 module.exports = exports = Map;

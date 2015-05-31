@@ -73,17 +73,15 @@ Bsp.prototype.loadSurfaces = function (file, lump) {
         surface.lightMapOffset = file.readInt32();
         this.surfaces.push(surface);
 
-        /*
-        var textureName = this.textures[this.texInfos[surface.texInfoId].textureId].name;
+        /*var textureName = this.textures[this.texInfos[surface.texInfoId].textureId].name;
         surface.flags = 0;
         if (textureName.startsWith('sky')) { // TODO: Subdivide surfaces...
             surface.flags |= (BspFlags.SURF_DRAWTILED | BspFlags.SURF_DRAWSKY);
         }
         if (textureName.startsWith('*'))
             surface.flags |= (BspFlags.SURF_DRAWTILED | BspFlags.SURF_DRAWTURB);
-
         this.calculateSurfaceExtents(surface);
-        this.surfaces[i] = surface;   */
+        this.surfaces[i] = surface;*/
     }
 };
 
