@@ -64,13 +64,22 @@ Assets.prototype.insert = function(item, data) {
     }
 };
 
-Assets.prototype.load = function(name) {
-    if (name.indexOf('pak/') === 0) {
-        name = name.substr(4);
-        var data = this.pak.load(name);
-        return new Texture(data, { palette: this.palette });
-    } else {
-        throw 'Error: Cannot load files outside PAK.';
+Assets.prototype.load = function(name, options) {
+    var index = name.indexOf('/');
+    var type = name.substr(0, index);
+    var name = name.substr(index + 1);
+
+    var options = options || {};
+    options.palette = this.palette;
+    switch(type) {
+        case 'pak':
+            var data = this.pak.load(name);
+            return new Texture(data, options);
+        case 'wad':
+            var data = this.wad.get(name);
+            return new Texture(data, options);
+        default:
+            throw 'Error: Cannot load files outside PAK/WAD: ' + name;
     }
 };
 

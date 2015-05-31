@@ -1,7 +1,5 @@
 var Texture = require('gl/texture');
 
-/* A texture atlas is used to minimize texture switches by packing a number of
- "sub" textures into one larger texture */
 var Atlas = function (width, height) {
     this.width = width || 512;
     this.height = height || 512;
@@ -10,18 +8,14 @@ var Atlas = function (width, height) {
     this.texture = null;
 };
 
-/* Gets a sub texture by id */
 Atlas.prototype.getSubTexture = function (subTextureId) {
     return this.subTextures[subTextureId];
 };
 
-/* Add a sub texture to be processed in a coming compile call */
 Atlas.prototype.addSubTexture = function (texture) {
     var node = this.getFreeNode(this.tree, texture);
-    if (node == null) {
+    if (node == null)
         throw 'Error: Unable to pack sub texture! It simply won\'t fit. :/';
-        return null;
-    }
     node.texture = texture;
     this.subTextures.push({
         texture: node.texture,
@@ -35,12 +29,10 @@ Atlas.prototype.addSubTexture = function (texture) {
     return this.subTextures.length - 1;
 };
 
-/* Re-use a subtexture or a part of one or several by specifying another set of coordinates */
 Atlas.prototype.reuseSubTexture = function (s1, t1, s2, t2) {
     this.subTextures.push({ s1: s1, t1: t1, s2: s2, t2: t2 });
 };
 
-/* Compiles all sub textures to one single texture */
 Atlas.prototype.compile = function(shader) {
 
     var buffer = new Float32Array(this.subTextures.length * 6 * 5); // x,y,z,s,t
@@ -86,7 +78,6 @@ Atlas.prototype.compile = function(shader) {
     this.tree = null;
 };
 
-/*  Short form to add a set of 6 sprite vertices to a buffer */
 Atlas.prototype.addSprite = function (data, offset, x, y, width, height) {
     var z = 0;
     data[offset + 0] = x; data[offset + 1] = y; data[offset + 2] = z;
@@ -103,7 +94,6 @@ Atlas.prototype.addSprite = function (data, offset, x, y, width, height) {
     data[offset + 28] = 0; data[offset + 29] = 0;
 };
 
-/* Finds free space for a texture by traversing the space tree */
 Atlas.prototype.getFreeNode = function (node, texture) {
     if (node.children[0] || node.children[1]) {
         var result = this.getFreeNode(node.children[0], texture);

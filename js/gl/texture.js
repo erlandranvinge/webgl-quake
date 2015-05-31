@@ -9,15 +9,7 @@ var Texture = function(file, options) {
     if (!options.width || !options.height) {
         options.width = file.readUInt32();
         options.height = file.readUInt32();
-
-        var pixels = new Uint8Array(4 * options.width * options.height);
-        for (var i = 0; i < options.width * options.height; i++) {
-            var color = file.readUInt8();
-            pixels[i*4] = color;
-            pixels[i*4+1] = color;
-            pixels[i*4+2] = color;
-            pixels[i*4+3] = 0;
-        }
+        var pixels = options.palette.apply(file, options.width, options.height);
     }
 
     options.format = options.format || gl.RGBA;
@@ -68,6 +60,32 @@ Texture.prototype.drawTo = function (callback) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     gl.viewport(v[0], v[1], v[2], v[3]);
+};
+
+Texture.prototype.asDataUrl = function() {
+    var framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.id, 0);
+
+    var width = this.width;
+    var height = this.height;
+
+    // Read the contents of the framebuffer
+    var data = new Uint8Array(width * height * 4);
+    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
+    gl.deleteFramebuffer(framebuffer);
+
+    // Create a 2D canvas to store the result
+    var canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var context = canvas.getContext('2d');
+
+    // Copy the pixels to a 2D canvas
+    var imageData = context.createImageData(width, height);
+    imageData.data.set(data);
+    context.putImageData(imageData, 0, 0);
+    return canvas.toDataURL();
 };
 
 module.exports = exports = Texture;

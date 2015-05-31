@@ -15,16 +15,19 @@ gl.init = function(id) {
 
     gl.width = canvas.width;
     gl.height = canvas.height;
-    gl.clearColor(0, 0, 1, 1);
+    gl.clearColor(0, 0, 0, 1);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.depthFunc(gl.LEQUAL);
     gl.cullFace(gl.FRONT);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.viewport(0, 0, gl.width, gl.height);
 
     window.vec2 = glMatrix.vec2;
     window.vec3 = glMatrix.vec3;
     window.mat4 = glMatrix.mat4;
     window.gl = gl;
+
+    return gl;
 };
 
 module.exports = exports = gl;
