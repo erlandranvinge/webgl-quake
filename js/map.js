@@ -7,7 +7,6 @@ var Map = function(bsp) {
         var texture = bsp.textures[i];
         var options = { width: texture.width, height: texture.height, palette: assets.palette };
         this.textures[texture.name] = new Texture(texture.data, options);
-        console.log(this.textures[texture.name].asDataUrl());
     }
 };
 

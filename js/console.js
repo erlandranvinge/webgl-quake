@@ -10,8 +10,9 @@ var Console = function() {
    var backgroundTexture = assets.load('pak/gfx/conback.lmp');
    backgroundTexture.drawTo(function(p) {
       gl.enable(gl.BLEND);
-      var version = 'Q ' + settings.version;
-      font.drawString(gl.width * 0.8, gl.height * 0.93, version, 1);
+      var version = 'WebGL ' + settings.version;
+      font.drawString(gl.width * 0.7, gl.height * 0.93, version, 1);
+      font.render(assets.shaders.texture2d, p);
    });
    var background = new Sprites(320, 200);
    background.textures.addSubTexture(backgroundTexture);
@@ -19,7 +20,6 @@ var Console = function() {
 
    this.font = font;
    this.background = background;
-   console.log(fontTexture.asDataUrl());
 };
 
 Console.prototype.print = function(msg) {
@@ -29,7 +29,7 @@ Console.prototype.print = function(msg) {
 Console.prototype.draw = function(p) {
 
    this.background.clear();
-   this.background.drawSprite(0, 0, 0, gl.width, gl.height, 1, 1, 1, 1.0);
+   this.background.drawSprite(0, 0, -100, gl.width, gl.height, 1, 1, 1, 1.0);
    this.background.render(assets.shaders.color2d, p);
 
    gl.enable(gl.BLEND);
