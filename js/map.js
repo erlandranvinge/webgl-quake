@@ -10,6 +10,7 @@ var Map = function(bsp, wireframe) {
         this.textures[texture.name] = new Texture(texture.data, options);
     }
 
+
     var chains = [];
     for (var m in bsp.models) {
         var model = bsp.models[m];
@@ -19,13 +20,13 @@ var Map = function(bsp, wireframe) {
 
             var chain = chains[texInfo.textureId];
             if (!chain) {
-                chains[texInfo.textureId] = {
+                chain = {
                     textureId: texInfo.textureId,
                     vertices: [],
                     flags: surface.flags
                 };
+                chains[texInfo.textureId] = chain;
             }
-            console.log(chains);
 
             var indices = [];
             for (var e = surface.edgeStart; e < surface.edgeStart + surface.edgeCount; e++) {
@@ -57,10 +58,16 @@ var Map = function(bsp, wireframe) {
                 var s = vec3.dot(v, texInfo.vectorS) + texInfo.distS;
                 var t = vec3.dot(v, texInfo.vectorT) + texInfo.distT;
 
-                var s1 = s / this.textures[texInfo.textureId].width;
-                var t1 = t / this.textures[texInfo.textureId].height;
+                var s1 = s / bsp.textures[texInfo.textureId].width;
+                var t1 = t / bsp.textures[texInfo.textureId].height;
                 chain.vertices.push(s1);
                 chain.vertices.push(t1);
+
+
+                chain.vertices.push(0);
+                chain.vertices.push(0);
+                /*
+
 
                 // Shadow map texture coordinates
                 var s2 = s;
@@ -76,7 +83,7 @@ var Map = function(bsp, wireframe) {
                 t2 /= (Bsp.BLOCK_HEIGHT * 16);
 
                 chain.vertices.push(s2);
-                chain.vertices.push(t2);
+                chain.vertices.push(t2);*/
             }
         }
     }
