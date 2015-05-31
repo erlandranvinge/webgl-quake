@@ -35,7 +35,7 @@ Quake.prototype.tick = function() {
 Quake.prototype.start = function() {
     Quake.instance = this;
     webgl.init('canvas');
-    this.ortho = mat4.ortho(mat4.create(), 0, gl.width, 0, gl.height, -10, 10);
+    this.ortho = mat4.ortho(mat4.create(), 0, gl.width, gl.height, 0, -10, 10);
 
     assets.add('data/pak0.pak');
     assets.add('shaders/color2d.shader');

@@ -15,9 +15,9 @@ Palette.prototype.apply = function(data, width, height, alpha) {
     for (var i = 0; i < width * height; i++) {
         var index = data.readUInt8();
         var color = this.colors[index];
-        pixels[i*4] = color.r;
-        pixels[i*4+1] = color.g;
-        pixels[i*4+2] = color.b;
+        pixels[i*4] = color.r * 1.2;
+        pixels[i*4+1] = color.g * 1.2;
+        pixels[i*4+2] = color.b * 1.2;
         pixels[i*4+3] = (alpha && !index) ? 0 : 255;
     }
     return pixels;

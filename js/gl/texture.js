@@ -12,7 +12,7 @@ var Texture = function(file, options) {
     }
 
     if (file) {
-        var pixels = options.palette.apply(file, options.width, options.height);
+        var pixels = options.palette.apply(file, options.width, options.height, options.alpha);
     }
 
     options.format = options.format || gl.RGBA;

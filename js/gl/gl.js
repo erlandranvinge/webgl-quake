@@ -19,7 +19,6 @@ gl.init = function(id) {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.depthFunc(gl.LEQUAL);
     gl.cullFace(gl.FRONT);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.viewport(0, 0, gl.width, gl.height);
 
     window.vec2 = glMatrix.vec2;

@@ -39,14 +39,14 @@ Font.prototype.drawCharacter = function(x, y, index) {
     this.elementCount += 6;
 };
 
-Font.prototype.drawString = function(x, y, str) {
+Font.prototype.drawString = function(x, y, str, mode) {
+    var offset = mode ? 128 : 0;
     for (var i = 0; i < str.length; i++)
-        this.drawCharacter(x + ((i + 1) << 3), y, str.charCodeAt(i));
+        this.drawCharacter(x + ((i + 1) * this.charWidth), y, str.charCodeAt(i) + offset);
 };
 
 Font.prototype.render = function(shader, p) {
-
-    if (this.elementCount == 0)
+    if (!this.elementCount)
         return;
 
     shader.use();
@@ -61,6 +61,7 @@ Font.prototype.render = function(shader, p) {
 
     gl.bindTexture(gl.TEXTURE_2D, this.texture.id);
     gl.drawArrays(gl.TRIANGLES, 0, this.elementCount);
+
 
     this.elementCount = 0;
     this.offset = 0;
