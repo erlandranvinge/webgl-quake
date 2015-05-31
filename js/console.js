@@ -1,9 +1,9 @@
 var Texture = require('gl/texture');
 
-var Console = function(pak) {
+var Console = function(assets) {
+
    //var data = pak.load('gfx/conback.lmp');
    //new Texture(data, { palette: pak.palette });
-
 
 
 };

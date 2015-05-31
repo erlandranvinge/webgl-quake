@@ -30,7 +30,7 @@ Quake.prototype.start = function() {
 
     var assets = new Assets();
     assets.add('data/pak0.pak');
-    assets.add('shaders/console.shader', 'text');
+    assets.add('shaders/console.shader');
 
     assets.loadAll(function() {
         console.log('Loaded cached assets');

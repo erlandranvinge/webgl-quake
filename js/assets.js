@@ -1,53 +1,73 @@
+var Pak = require('formats/pak');
+var Wad = require('formats/wad');
+var Shader = require('gl/shader');
+var Palette = require('formats/palette');
 
-var Assets = function() {
-    this.added = {};
-    this.cached = {};
-    this.loaded = 0;
-    this.count = 0;
-};
-
-Assets.prototype.add = function(name, format) {
-    format = format || 'binary';
-    this.added[name] = { name: name, format: format };
-    this.count++;
-};
-
-Assets.prototype.get = function(name) {
-    var item = this.cached[name];
-    if (!item)
-        throw 'Error: Trying to get non-loaded asset: ' + name;
+function getExtension(path) {
+    var index = path.lastIndexOf('.');
+    if (index === -1) return '';
+    return path.substr(index + 1);
 }
 
-Assets.prototype.load = function(item) {
+function getName(path) {
+    var index = path.lastIndexOf('/');
+    return path.substr(index + 1);
+}
+
+function download(item, done) {
     var request = new XMLHttpRequest();
-    request.open('GET', item.name, true);
+    request.open('GET', item.url, true);
     request.overrideMimeType('text/plain; charset=x-user-defined');
-
-    if (item.format === 'binary')
+    if (item.binary)
         request.responseType = 'arraybuffer';
-
-    var self = this;
     request.onload = function (e) {
         if (request.status !== 200)
             throw 'Unable to read file from url: ' + item.name;
 
-        var data = item.format === 'binary' ?
+        var data = item.binary ?
             new Uint8Array(request.response) : request.responseText;
-        self.cached[item.name] = data;
-
-        if (++self.loaded === self.count)
-            self.done();
+        done(item, data);
     };
+
     request.onerror = function (e) {
         throw 'Unable to read file from url: ' + request.statusText;
     };
     request.send(null);
+}
+
+var Assets = function() {
+    this.pending = [];
+    this.shaders = {};
+};
+
+Assets.prototype.add = function(url, type) {
+    type = type || getExtension(url);
+    if (!type)
+        throw 'Error: Unable to determine type for asset: ' + name;
+    var binary = type !== 'shader';
+    this.pending.push({ url: url, name: getName(url), type: type, binary: binary });
 };
 
 Assets.prototype.loadAll = function(done) {
-    this.done = done;
-    for (var item in this.added) {
-        this.load(this.added[item]);
+    var total = this.pending.length;
+    var self = this;
+    for (var i in this.pending) {
+        var pending = this.pending[i];
+        download(pending, function(item, data) {
+            switch (item.type) {
+                case 'pak':
+                    self.pak = new Pak(data);
+                    self.wad = new Wad(self.pak.load('gfx.wad'));
+                    self.palette = new Palette(self.pak.load('gfx/palette.lmp'));
+                    break;
+                case 'shader':
+                    self.shaders[item.name] = new Shader(data);
+                    break;
+                default: throw 'Error: Unknown type loaded: ' + item.type;
+            }
+            if (--total <= 0)
+                done();
+        });
     }
 };
 

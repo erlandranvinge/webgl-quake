@@ -22,8 +22,6 @@ var Pak = function(data) {
     console.log('PAK: Loaded %i entries.', indexFileCount);
 
     this.file = file;
-    this.wad = new Wad(this.load('gfx.wad'));
-    this.palette = new Palette(this.load('gfx/palette.lmp'));
 };
 
 Pak.prototype.load = function(name) {
