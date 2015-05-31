@@ -62,7 +62,7 @@ Texture.prototype.drawTo = function (callback) {
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, Texture.renderBuffer);
     gl.viewport(0, 0, this.width, this.height);
 
-    var projectionMatrix = mat4.ortho(0, this.width, 0, this.height, -99999, 99999);
+    var projectionMatrix = mat4.ortho(mat4.create(), 0, this.width, 0, this.height, -99999, 99999);
     callback(projectionMatrix);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);

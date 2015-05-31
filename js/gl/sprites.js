@@ -87,14 +87,13 @@ Sprites.prototype.clear = function () {
     this.spriteCount = 0;
 };
 
-Sprites.prototype.render = function (projectionMatrix, firstSprite, spriteCount) {
+Sprites.prototype.render = function (shader, p, firstSprite, spriteCount) {
     if (this.spriteCount <= 0)
         return;
 
     firstSprite = firstSprite || 0;
     spriteCount = spriteCount || this.spriteCount;
 
-    var shader = shaders.orthoShader;
     shader.use();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
 
@@ -106,7 +105,7 @@ Sprites.prototype.render = function (projectionMatrix, firstSprite, spriteCount)
     gl.vertexAttribPointer(shader.attributes.texCoordsAttribute, 2, gl.FLOAT, false, 36, 12);
     gl.vertexAttribPointer(shader.attributes.colorsAttribute, 4, gl.FLOAT, false, 36, 20);
 
-    gl.uniformMatrix4fv(shader.uniforms.projectionMatrix, false, projectionMatrix);
+    gl.uniformMatrix4fv(shader.uniforms.projectionMatrix, false, p);
 
     if (this.dirty) {
         gl.bufferData(gl.ARRAY_BUFFER, this.data, gl.STATIC_DRAW);

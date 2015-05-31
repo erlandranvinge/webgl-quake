@@ -2,11 +2,12 @@
 body {
     margin: 0;
     padding: 0;
-    background: #000;
+    background: #fff;
 }
 
 canvas {
     /*cursor: none;*/
-    width: 100%;/*640px;*/
-    height: 100%; /*400px;*/
+    width: 640px;
+    height: 400px;
+    border: 2px solid red;
 }
