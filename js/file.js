@@ -38,6 +38,18 @@ File.prototype.readUInt8 = function() {
     return this.buffer.readUInt8(this.offset++);
 };
 
+File.prototype.readUInt16 = function() {
+    var result = this.buffer.readUInt16LE(this.offset);
+    this.offset += 2;
+    return result;
+};
+
+File.prototype.readInt16 = function() {
+    var result = this.buffer.readInt16LE(this.offset);
+    this.offset += 2;
+    return result;
+};
+
 File.prototype.readUInt32 = function() {
     var result = this.buffer.readUInt32LE(this.offset);
     this.offset += 4;
@@ -46,6 +58,12 @@ File.prototype.readUInt32 = function() {
 
 File.prototype.readInt32 = function() {
     var result = this.buffer.readInt32LE(this.offset);
+    this.offset += 4;
+    return result;
+};
+
+File.prototype.readFloat = function() {
+    var result = this.buffer.readFloatLE(this.offset);
     this.offset += 4;
     return result;
 };
