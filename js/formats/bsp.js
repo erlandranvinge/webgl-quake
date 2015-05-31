@@ -32,8 +32,12 @@ Bsp.prototype.loadVertices = function(file, lump) {
     this.vertexCount = lump.size / 12;
     this.vertices = [];
     file.seek(lump.offset);
-    for (var i = 0; i < this.vertexCount * 3; i++) {
-        this.vertices.push(file.readFloat());
+    for (var i = 0; i < this.vertexCount; i++) {
+        this.vertices.push({
+            x: file.readFloat(),
+            y: file.readFloat(),
+            z: file.readFloat()
+        });
     }
 };
 

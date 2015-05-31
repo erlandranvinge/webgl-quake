@@ -1,8 +1,9 @@
 var Texture = require('gl/texture');
 var assets = require('assets');
 var utils = require('utils');
+var wireframe = false;
 
-var Map = function(bsp, wireframe) {
+var Map = function(bsp) {
     this.textures = [];
     for (var i in bsp.textures) {
         var texture = bsp.textures[i];
@@ -36,11 +37,10 @@ var Map = function(bsp, wireframe) {
                 }
             }
             indices = wireframe ? indices : utils.triangulate(indices);
-            for (var i = 0; i < indices.length; i+= 3) {
-                chain.data.push(bsp.vertices[indices[i]]);
-                chain.data.push(bsp.vertices[indices[i+1]]);
-                chain.data.push(bsp.vertices[indices[i+2]]);
-                chain.data.push(0, 0, 0, 0);
+            for (var i = 0; i < indices.length; i++) {
+                chain.data.push(bsp.vertices[indices[i]].x);
+                chain.data.push(bsp.vertices[indices[i]].y);
+                chain.data.push(bsp.vertices[indices[i]].z);
             }
         }
     }
@@ -54,11 +54,24 @@ var Map = function(bsp, wireframe) {
     this.buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
-    this.buffer.stride = 7 * 4;
+    this.buffer.stride = 3 * 4;
+    this.buffer.elements = data.length / 3;
 };
 
-Map.prototype.draw = function(p) {
+Map.prototype.draw = function(p, m) {
+    var shader = assets.shaders.world;
+    var buffer = this.buffer;
+    var mode = wireframe ? gl.LINES : gl.TRIANGLES;
 
+    shader.use();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+    gl.disableVertexAttribArray(1);
+
+    gl.vertexAttribPointer(shader.attributes.vertexAttribute, 3, gl.FLOAT, false, buffer.stride, 0);
+    gl.uniformMatrix4fv(shader.uniforms.projectionMatrix, false, p);
+    gl.uniformMatrix4fv(shader.uniforms.modelviewMatrix, false, m);
+
+    gl.drawArrays(mode, 0, buffer.elements);
 };
 
 module.exports = exports = Map;
