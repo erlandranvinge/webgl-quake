@@ -1,11 +1,11 @@
-var Texture = require('gl/texture');
+var Sprites = require('gl/sprites');
 
 var Console = function(assets) {
 
-   //var data = pak.load('gfx/conback.lmp');
-   //new Texture(data, { palette: pak.palette });
-
-
+   var background = assets.load('pak/gfx/conback.lmp');
+   this.background = new Sprites(320, 200);
+   this.background.textures.addSubTexture(background);
+   this.background.textures.compile(assets.shaders.atlas);
 };
 
 Console.prototype.draw = function() {

@@ -1,6 +1,7 @@
 var Pak = require('formats/pak');
 var Wad = require('formats/wad');
 var Shader = require('gl/shader');
+var Texture = require('gl/texture');
 var Palette = require('formats/palette');
 
 function getExtension(path) {
@@ -10,8 +11,9 @@ function getExtension(path) {
 }
 
 function getName(path) {
-    var index = path.lastIndexOf('/');
-    return path.substr(index + 1);
+    var index1 = path.lastIndexOf('/');
+    var index2 = path.lastIndexOf('.');
+    return path.substr(index1 + 1, index2 - index1 - 1);
 }
 
 function download(item, done) {
@@ -48,25 +50,41 @@ Assets.prototype.add = function(url, type) {
     this.pending.push({ url: url, name: getName(url), type: type, binary: binary });
 };
 
-Assets.prototype.loadAll = function(done) {
+Assets.prototype.insert = function(item, data) {
+    switch (item.type) {
+        case 'pak':
+            this.pak = new Pak(data);
+            this.wad = new Wad(this.pak.load('gfx.wad'));
+            this.palette = new Palette(this.pak.load('gfx/palette.lmp'));
+            break;
+        case 'shader':
+            this.shaders[item.name] = new Shader(data);
+            break;
+        default: throw 'Error: Unknown type loaded: ' + item.type;
+    }
+};
+
+Assets.prototype.load = function(name) {
+    if (name.indexOf('pak/') === 0) {
+        name = name.substr(4);
+        var data = this.pak.load(name);
+        return new Texture(data, { palette: this.palette });
+    } else {
+        throw 'Error: Cannot load files outside PAK.';
+    }
+};
+
+Assets.prototype.precache = function(done) {
     var total = this.pending.length;
     var self = this;
     for (var i in this.pending) {
         var pending = this.pending[i];
         download(pending, function(item, data) {
-            switch (item.type) {
-                case 'pak':
-                    self.pak = new Pak(data);
-                    self.wad = new Wad(self.pak.load('gfx.wad'));
-                    self.palette = new Palette(self.pak.load('gfx/palette.lmp'));
-                    break;
-                case 'shader':
-                    self.shaders[item.name] = new Shader(data);
-                    break;
-                default: throw 'Error: Unknown type loaded: ' + item.type;
-            }
-            if (--total <= 0)
+            self.insert(item, data);
+            if (--total <= 0) {
+                self.pending = [];
                 done();
+            }
         });
     }
 };
