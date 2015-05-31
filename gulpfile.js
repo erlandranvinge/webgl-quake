@@ -22,7 +22,8 @@ gulp.task('watch', function() {
 
         gulp.src('js/quake.js')
             .pipe(browserify(options))
-            .pipe(gulp.dest('./'));
+            .pipe(gulp.dest('./'))
+            .pipe(connect.reload());
         console.log('Bundle complete!');
     });
 });

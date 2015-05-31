@@ -3,6 +3,8 @@ var gl = require('gl/gl');
 var settings = require('settings');
 var Console = require('./console');
 var Pak = require('./pak');
+var Wad = require('wad');
+var utils = require('utils');
 
 if (!window.requestFrame) {
     window.requestFrame = ( function() {
@@ -28,7 +30,12 @@ Quake.prototype.tick = function() {
 };
 
 Quake.prototype.start = function() {
-    var pak = new Pak('data/pak0.pak');
+    var data = utils.download('data/pak0.pak', function(data) {
+        var pak = new Pak(data);
+        var wad = new Wad(pak.load('gfx.wad'));
+
+
+    });
 
     gl.init('canvas');
     this.tick();
