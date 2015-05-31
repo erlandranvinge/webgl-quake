@@ -1,5 +1,6 @@
 var File = require('file');
-var Wad = require('wad');
+var Wad = require('formats/wad');
+var Palette = require('formats/palette');
 
 var Pak = function(data) {
     var file = new File(data);
@@ -22,6 +23,7 @@ var Pak = function(data) {
 
     this.file = file;
     this.wad = new Wad(this.load('gfx.wad'));
+    this.palette = new Palette(this.load('gfx/palette.lmp'));
 };
 
 Pak.prototype.load = function(name) {
