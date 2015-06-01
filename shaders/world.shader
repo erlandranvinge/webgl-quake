@@ -22,9 +22,10 @@
     varying vec2 shadowTexCoords;
     uniform sampler2D textureMap;
     uniform sampler2D lightMap;
-
+    const float brightness = 1.4;
     void main(void) {
-        float intensity = texture2D(lightMap, shadowTexCoords.xy).x;
-        gl_FragColor = texture2D(textureMap, texCoords) * intensity * 1.5;
+
+        float intensity = 1.0 - texture2D(lightMap, shadowTexCoords.xy).x;
+        gl_FragColor = vec4(texture2D(textureMap, texCoords).xyz * intensity, 1.0) * brightness;
     }
 

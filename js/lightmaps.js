@@ -64,8 +64,8 @@ LightMaps.prototype.allocateBlock = function (width, height) {
         if (best + height > blockHeight)
             continue;
 
-        for (var i = 0; i < width; i++)
-            this.allocated[texId][result.x + i] = best + height;
+        for (var j = 0; j < width; j++)
+            this.allocated[texId][result.x + j] = best + height;
 
         result.texId = texId;
         return result;

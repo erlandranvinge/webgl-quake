@@ -111,18 +111,18 @@ Map.prototype.draw = function(p, m) {
 
     shader.use();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
+    gl.enableVertexAttribArray(shader.attributes.shadowTexCoordsAttribute);
+
     gl.vertexAttribPointer(shader.attributes.vertexAttribute, 3, gl.FLOAT, false, buffer.stride, 0);
     gl.vertexAttribPointer(shader.attributes.texCoordsAttribute, 2, gl.FLOAT, false, buffer.stride, 12);
     gl.vertexAttribPointer(shader.attributes.shadowTexCoordsAttribute, 2, gl.FLOAT, false, buffer.stride, 20);
     gl.uniformMatrix4fv(shader.uniforms.projectionMatrix, false, p);
     gl.uniformMatrix4fv(shader.uniforms.modelviewMatrix, false, m);
-
     gl.uniform1i(shader.uniforms.textureMap, 0);
     gl.uniform1i(shader.uniforms.lightMap, 1);
 
-
     this.lightMaps.texture.bind(1);
-
     for (var c in this.chains) {
         var chain = this.chains[c];
         var texture = this.textures[chain.texId];

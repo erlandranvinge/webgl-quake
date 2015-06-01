@@ -21,6 +21,12 @@ File.prototype.slice = function(offset, length) {
     return new File(this.buffer.slice(offset, offset + length));
 };
 
+File.prototype.read = function(length) {
+    var result = new File(this.buffer.slice(this.offset, this.offset + length));
+    this.offset += length;
+    return result;
+};
+
 File.prototype.readString = function(length) {
     var result = '';
     var terminated = false;

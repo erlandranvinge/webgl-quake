@@ -29,7 +29,7 @@ Console.prototype.print = function(msg) {
 Console.prototype.draw = function(p) {
 
    this.background.clear();
-   this.background.drawSprite(0, 0, -100, gl.width, gl.height, 1, 1, 1, 1.0);
+   this.background.drawSprite(0, 0, -400, gl.width, gl.height, 1, 1, 1, 1.0);
    this.background.render(assets.shaders.color2d, p);
 
    gl.enable(gl.BLEND);

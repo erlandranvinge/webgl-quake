@@ -8,10 +8,9 @@ var LightMap = function(data, offset, width, height) {
     for (var i = 0; i < width * height; i++) {
         var intensity = data[offset + i];
         intensity = !intensity ? 0 : intensity;
-
         pixels[i * 3 + 0] = intensity;
-        pixels[i * 3 + 1] = 0;
-        pixels[i * 3 + 2] = 0;
+        pixels[i * 3 + 1] = intensity;
+        pixels[i * 3 + 2] = intensity;
     }
 
     gl.bindTexture(gl.TEXTURE_2D, this.id);
