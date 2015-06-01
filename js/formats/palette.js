@@ -10,10 +10,10 @@ var Palette = function(file) {
     }
 };
 
-Palette.prototype.apply = function(data, width, height, alpha) {
+Palette.prototype.unpack = function(file, width, height, alpha) {
     var pixels = new Uint8Array(4 * width * height);
     for (var i = 0; i < width * height; i++) {
-        var index = data.readUInt8();
+        var index = file.readUInt8();
         var color = this.colors[index];
         pixels[i*4] = color.r;
         pixels[i*4+1] = color.g;

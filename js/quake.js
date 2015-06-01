@@ -31,6 +31,20 @@ var position = [0, 0, 0];
 
 Quake.prototype.tick = function() {
 
+    if (this.input.left)
+        angle -= 0.02;
+    if (this.input.right)
+        angle += 0.02;
+    if (this.input.up)
+        position[0] -= 10;
+    if (this.input.down)
+        position[0] += 10;
+    if (this.input.flyUp)
+        position[2] -= 10;
+    if (this.input.flyDown)
+        position[2] += 10;
+
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.disable(gl.DEPTH_TEST);
@@ -40,21 +54,11 @@ Quake.prototype.tick = function() {
 
 
     gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
     var m = utils.quakeIdentity(mat4.create());
     mat4.translate(m, m, [100, 100, -20]);
-    mat4.translate(m, m, position);
-
-    if (this.input.left)
-        angle += 0.04;
-    if (this.input.right)
-        angle -= 0.04;
-    if (this.input.up)
-        position[0] -= 10;
-    if (this.input.down)
-        position[0] += 10;
-
-
     mat4.rotateZ(m, m, angle);
+    mat4.translate(m, m, position);
     this.map.draw(this.projection, m);
 };
 

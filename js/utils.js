@@ -12,7 +12,7 @@ Utils.triangulate = function(points) {
 };
 
 Utils.quakeIdentity = function(a) {
-    a[0] = 0; a[4] = -1; a[8] = 0; a[12] = 0;
+    a[0] = 0; a[4] = 1; a[8] = 0; a[12] = 0;
     a[1] = 0; a[5] = 0; a[9] = -1; a[13] = 0;
     a[2] = -1; a[6] = 0; a[10] = 0; a[14] = 0;
     a[3] = 0; a[7] = 0; a[11] = 0; a[15] = 1;
@@ -23,11 +23,11 @@ Utils.deg2Rad = function(degrees) {
     return degrees * Math.PI / 180;
 };
 
-Utils.isPowerOfTwo = function(x) {
+Utils.isPowerOf2 = function(x) {
     return (x & (x - 1)) == 0;
 };
 
-Utils.nextHighestPowerOfTwo = function(x) {
+Utils.nextPowerOf2 = function(x) {
     --x;
     for (var i = 1; i < 32; i <<= 1) {
         x = x | x >> i;

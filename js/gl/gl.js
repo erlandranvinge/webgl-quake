@@ -18,7 +18,7 @@ gl.init = function(id) {
     gl.clearColor(0, 0, 0, 1);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.depthFunc(gl.LEQUAL);
-    gl.cullFace(gl.FRONT);
+    //gl.cullFace(gl.FRONT);
     gl.viewport(0, 0, gl.width, gl.height);
 
     window.vec2 = glMatrix.vec2;
