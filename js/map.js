@@ -100,36 +100,8 @@ var Map = function(bsp) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
     this.buffer.stride = 7 * 4;
-};
 
-
-Map.prototype.buildLightMaps = function(bsp) {
-    var usedMaps = 0;
-    for (var m = 0; m < bsp.models.length; m++) {
-        var model = bsp.models[m];
-
-        for (var i = 0; i < model.surfaceCount; i++) {
-            var surface = bsp.surfaces[model.firstSurface + i];
-            var width = (surface.extents[0] >> 4) + 1;
-            var height = (surface.extents[1] >> 4) + 1;
-
-            var result = this.allocateBlock(width, height);
-            surface.lightMapS = result.x;
-            surface.lightMapT = result.y;
-            usedMaps = Math.max(usedMaps, result.texId);
-            var offset = result.texId * Bsp.LIGHTMAP_BYTES * Bsp.BLOCK_WIDTH * Bsp.BLOCK_HEIGHT;
-            offset += (result.y * Bsp.BLOCK_WIDTH + result.x) * Bsp.LIGHTMAP_BYTES;
-            this.buildLightMap(surface, offset);
-        }
-    }
-    usedMaps++;
-
-    for (var i = 0; i < usedMaps; i++) {
-        this.lightMap = resources.loadLightMap('lightmap' + i, Bsp.BLOCK_WIDTH, Bsp.BLOCK_HEIGHT,
-            this.lightMaps, i * Bsp.BLOCK_WIDTH * Bsp.BLOCK_HEIGHT);
-    }
-    this.lightMaps = null;
-    this.allocated = null;
+    console.log(this.lightMaps.texture.asDataUrl());
 };
 
 Map.prototype.draw = function(p, m) {
@@ -142,14 +114,19 @@ Map.prototype.draw = function(p, m) {
     gl.vertexAttribPointer(shader.attributes.vertexAttribute, 3, gl.FLOAT, false, buffer.stride, 0);
     gl.vertexAttribPointer(shader.attributes.texCoordsAttribute, 2, gl.FLOAT, false, buffer.stride, 12);
     gl.vertexAttribPointer(shader.attributes.shadowTexCoordsAttribute, 2, gl.FLOAT, false, buffer.stride, 20);
-
     gl.uniformMatrix4fv(shader.uniforms.projectionMatrix, false, p);
     gl.uniformMatrix4fv(shader.uniforms.modelviewMatrix, false, m);
+
+    gl.uniform1i(shader.uniforms.textureMap, 0);
+    gl.uniform1i(shader.uniforms.lightMap, 1);
+
+
+    this.lightMaps.texture.bind(1);
 
     for (var c in this.chains) {
         var chain = this.chains[c];
         var texture = this.textures[chain.texId];
-        gl.bindTexture(gl.TEXTURE_2D, texture.id);
+        texture.bind(0);
         gl.drawArrays(mode, this.chains[c].offset, this.chains[c].elements);
     }
 };

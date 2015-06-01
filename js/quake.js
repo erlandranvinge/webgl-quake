@@ -57,8 +57,9 @@ Quake.prototype.tick = function() {
     gl.disable(gl.BLEND);
     var m = utils.quakeIdentity(mat4.create());
     mat4.translate(m, m, [100, 100, -20]);
-    mat4.rotateZ(m, m, angle);
     mat4.translate(m, m, position);
+    mat4.rotateZ(m, m, angle);
+
     this.map.draw(this.projection, m);
 };
 

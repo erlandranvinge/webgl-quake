@@ -25,6 +25,6 @@
 
     void main(void) {
         float intensity = texture2D(lightMap, shadowTexCoords.xy).x;
-        gl_FragColor = texture2D(textureMap, texCoords) * intensity;
+        gl_FragColor = texture2D(textureMap, texCoords) * intensity * 1.5;
     }
 
