@@ -1,4 +1,5 @@
 var Texture = require('gl/texture');
+var LightMaps = require('lightmaps');
 var assets = require('assets');
 var utils = require('utils');
 var wireframe = false;
@@ -8,6 +9,10 @@ var blockHeight = 512;
 
 var Map = function(bsp) {
     this.textures = [];
+    this.lightMaps = new LightMaps();
+    this.lightMaps.build(bsp);
+
+
     for (var texId in bsp.textures) {
         var texture = bsp.textures[texId];
         var options = {
@@ -95,6 +100,36 @@ var Map = function(bsp) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
     this.buffer.stride = 7 * 4;
+};
+
+
+Map.prototype.buildLightMaps = function(bsp) {
+    var usedMaps = 0;
+    for (var m = 0; m < bsp.models.length; m++) {
+        var model = bsp.models[m];
+
+        for (var i = 0; i < model.surfaceCount; i++) {
+            var surface = bsp.surfaces[model.firstSurface + i];
+            var width = (surface.extents[0] >> 4) + 1;
+            var height = (surface.extents[1] >> 4) + 1;
+
+            var result = this.allocateBlock(width, height);
+            surface.lightMapS = result.x;
+            surface.lightMapT = result.y;
+            usedMaps = Math.max(usedMaps, result.texId);
+            var offset = result.texId * Bsp.LIGHTMAP_BYTES * Bsp.BLOCK_WIDTH * Bsp.BLOCK_HEIGHT;
+            offset += (result.y * Bsp.BLOCK_WIDTH + result.x) * Bsp.LIGHTMAP_BYTES;
+            this.buildLightMap(surface, offset);
+        }
+    }
+    usedMaps++;
+
+    for (var i = 0; i < usedMaps; i++) {
+        this.lightMap = resources.loadLightMap('lightmap' + i, Bsp.BLOCK_WIDTH, Bsp.BLOCK_HEIGHT,
+            this.lightMaps, i * Bsp.BLOCK_WIDTH * Bsp.BLOCK_HEIGHT);
+    }
+    this.lightMaps = null;
+    this.allocated = null;
 };
 
 Map.prototype.draw = function(p, m) {

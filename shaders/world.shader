@@ -21,6 +21,7 @@
     varying vec2 texCoords;
     varying vec2 shadowTexCoords;
     uniform sampler2D textureMap;
+    uniform sampler2D lightMap;
 
     void main(void) {
         float intensity = texture2D(lightMap, shadowTexCoords.xy).x;

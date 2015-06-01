@@ -21,8 +21,9 @@ var Bsp = function(file) {
 
     this.loadTextures(file, header.miptexs);
     this.loadTexInfos(file, header.texinfos);
-    this.loadModels(file, header.models);
+    this.loadLightMaps(file, header.lightmaps);
 
+    this.loadModels(file, header.models);
     this.loadVertices(file, header.vertices);
     this.loadEdges(file, header.edges);
     this.loadSurfaceEdges(file, header.ledges);
@@ -168,6 +169,14 @@ Bsp.prototype.loadModels = function(file, lump) {
         model.surfaceCount = file.readInt32();
         this.models.push(model);
     }
+};
+
+
+Bsp.prototype.loadLightMaps = function (file, lump) {
+    file.seek(lump.offset);
+    this.lightMaps = [];
+    for (var i = 0; i < lump.size; i++)
+        this.lightMaps.push(file.readUInt8());
 };
 
 module.exports = exports = Bsp;

@@ -35,5 +35,15 @@ Utils.nextPowerOf2 = function(x) {
     return x + 1;
 };
 
+Utils.array2d = function(width, height) {
+    var result = new Array(height);
+    for (var y = 0; y < height; y++) {
+        result[y] = new Array(width);
+        for (var x = 0; x < width; x++)
+            result[y][x] = 0;
+    }
+    return result;
+};
+
 module.exports = exports = Utils;
 
