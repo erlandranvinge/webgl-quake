@@ -87,6 +87,16 @@ Texture.prototype.resample = function(pixels, width, height, newWidth, newHeight
     return new Uint8Array(image.data);
 };
 
+Texture.prototype.bind = function(unit) {
+    gl.activeTexture(gl.TEXTURE0 + (unit || 0));
+    gl.bindTexture(gl.TEXTURE_2D, this.id);
+};
+
+Texture.prototype.unbind = function(unit) {
+    gl.activeTexture(gl.TEXTURE0 + (unit || 0));
+    gl.bindTexture(gl.TEXTURE_2D, null);
+};
+
 Texture.prototype.asDataUrl = function() {
     var framebuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);

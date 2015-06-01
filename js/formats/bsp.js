@@ -19,13 +19,14 @@ var Bsp = function(file) {
         models: {offset: file.readInt32(), size: file.readInt32()}
     };
 
+    this.loadTextures(file, header.miptexs);
+    this.loadTexInfos(file, header.texinfos);
+    this.loadModels(file, header.models);
+
     this.loadVertices(file, header.vertices);
     this.loadEdges(file, header.edges);
     this.loadSurfaceEdges(file, header.ledges);
     this.loadSurfaces(file, header.faces);
-    this.loadTextures(file, header.miptexs);
-    this.loadTexInfos(file, header.texinfos);
-    this.loadModels(file, header.models);
 };
 
 Bsp.prototype.loadVertices = function(file, lump) {
@@ -58,6 +59,37 @@ Bsp.prototype.loadSurfaceEdges = function(file, lump) {
     }
 };
 
+Bsp.prototype.calculateSurfaceExtents = function(surface) {
+    var minS = 99999;
+    var maxS = -99999;
+    var minT = 99999;
+    var maxT = -99999;
+
+    for (var i = 0; i < surface.edgeCount; i++) {
+        var edgeIndex = this.edgeList[surface.edgeStart + i];
+        var vi = edgeIndex >= 0 ? this.edges[edgeIndex * 2] : this.edges[-edgeIndex * 2 + 1];
+        var v = [this.vertices[vi].x, this.vertices[vi].y, this.vertices[vi].z];
+        var texInfo = this.texInfos[surface.texInfoId];
+
+        var s = vec3.dot(v, texInfo.vectorS) + texInfo.distS;
+        minS = Math.min(minS, s);
+        maxS = Math.max(maxS, s);
+
+        var t = vec3.dot(v, texInfo.vectorT) + texInfo.distT;
+        minT = Math.min(minT, t);
+        maxT = Math.max(maxT, t);
+    }
+
+    /* Convert to ints */
+    minS = Math.floor(minS / 16);
+    minT = Math.floor(minT / 16);
+    maxS = Math.ceil(maxS / 16);
+    maxT = Math.ceil(maxT / 16);
+
+    surface.textureMins = [minS * 16, minT * 16];
+    surface.extents = [(maxS - minS) * 16, (maxT - minT) * 16];
+};
+
 Bsp.prototype.loadSurfaces = function (file, lump) {
 
     var surfaceCount = lump.size / 20;
@@ -73,17 +105,9 @@ Bsp.prototype.loadSurfaces = function (file, lump) {
 
         surface.lightStyles = [file.readUInt8(), file.readUInt8(), file.readUInt8(), file.readUInt8()];
         surface.lightMapOffset = file.readInt32();
-        this.surfaces.push(surface);
-
-        /*var textureName = this.textures[this.texInfos[surface.texInfoId].textureId].name;
         surface.flags = 0;
-        if (textureName.startsWith('sky')) { // TODO: Subdivide surfaces...
-            surface.flags |= (BspFlags.SURF_DRAWTILED | BspFlags.SURF_DRAWSKY);
-        }
-        if (textureName.startsWith('*'))
-            surface.flags |= (BspFlags.SURF_DRAWTILED | BspFlags.SURF_DRAWTURB);
         this.calculateSurfaceExtents(surface);
-        this.surfaces[i] = surface;*/
+        this.surfaces.push(surface);
     }
 };
 

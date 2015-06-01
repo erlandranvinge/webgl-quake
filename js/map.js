@@ -3,6 +3,9 @@ var assets = require('assets');
 var utils = require('utils');
 var wireframe = false;
 
+var blockWidth = 512;
+var blockHeight = 512;
+
 var Map = function(bsp) {
     this.textures = [];
     for (var texId in bsp.textures) {
@@ -55,7 +58,20 @@ var Map = function(bsp) {
                 var s1 = s / this.textures[texInfo.textureId].width;
                 var t1 = t / this.textures[texInfo.textureId].height;
 
-                chain.data.push(v[0], v[1], v[2], s1, t1);
+                // Shadow map texture coordinates
+                var s2 = s;
+                s2 -= surface.textureMins[0];
+                s2 += (surface.lightMapS * 16);
+                s2 += 8;
+                s2 /= (blockWidth * 16);
+
+                var t2 = t;
+                t2 -= surface.textureMins[1];
+                t2 += (surface.lightMapT * 16);
+                t2 += 8;
+                t2 /= (blockHeight * 16);
+
+                chain.data.push(v[0], v[1], v[2], s1, t1, s2, t2);
             }
         }
     }
@@ -70,7 +86,7 @@ var Map = function(bsp) {
         var chain = {
             offset: offset,
             texId: chains[c].texId,
-            elements: chains[c].data.length / 5
+            elements: chains[c].data.length / 7
         };
         offset += chain.elements;
         this.chains.push(chain);
@@ -78,7 +94,7 @@ var Map = function(bsp) {
     this.buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
-    this.buffer.stride = 5 * 4;
+    this.buffer.stride = 7 * 4;
 };
 
 Map.prototype.draw = function(p, m) {
@@ -90,6 +106,7 @@ Map.prototype.draw = function(p, m) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.vertexAttribPointer(shader.attributes.vertexAttribute, 3, gl.FLOAT, false, buffer.stride, 0);
     gl.vertexAttribPointer(shader.attributes.texCoordsAttribute, 2, gl.FLOAT, false, buffer.stride, 12);
+    gl.vertexAttribPointer(shader.attributes.shadowTexCoordsAttribute, 2, gl.FLOAT, false, buffer.stride, 20);
 
     gl.uniformMatrix4fv(shader.uniforms.projectionMatrix, false, p);
     gl.uniformMatrix4fv(shader.uniforms.modelviewMatrix, false, m);
