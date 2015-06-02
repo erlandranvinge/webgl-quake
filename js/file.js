@@ -17,6 +17,10 @@ File.prototype.skip = function(bytes) {
     this.offset += bytes;
 };
 
+File.prototype.eof = function() {
+    return this.offset >= this.buffer.length;
+};
+
 File.prototype.slice = function(offset, length) {
     return new File(this.buffer.slice(offset, offset + length));
 };
@@ -31,17 +35,30 @@ File.prototype.readString = function(length) {
     var result = '';
     var terminated = false;
     for (var i = 0; i < length; i++) {
-        var byte = this.buffer.readUInt8(this.offset);
+        var byte = this.buffer.readUInt8(this.offset++);
         if (byte === 0x0) terminated = true;
         if (!terminated)
             result += String.fromCharCode(byte);
-        this.offset++;
+    }
+    return result;
+};
+
+File.prototype.readCString = function() {
+    var result = '';
+    for (var i = 0; i < 128; i++) {
+        var byte = this.buffer.readUInt8(this.offset++);
+        if (byte === 0x0) return result;
+        result += String.fromCharCode(byte);
     }
     return result;
 };
 
 File.prototype.readUInt8 = function() {
     return this.buffer.readUInt8(this.offset++);
+};
+
+File.prototype.readInt8 = function() {
+    return this.buffer.readInt8(this.offset++);
 };
 
 File.prototype.readUInt16 = function() {

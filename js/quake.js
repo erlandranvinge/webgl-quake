@@ -22,7 +22,7 @@ if (!window.requestFrame) {
 }
 
 var tick = function() {
-   // requestFrame(tick);
+    requestFrame(tick);
     Quake.instance.tick();
 };
 
