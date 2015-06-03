@@ -1,10 +1,5 @@
 
-var Flags = {
-    rocket: 1, grenade: 2, gib: 3, rotate: 8,
-    tracer: 16, zomGib: 32, trace2: 64, trace3: 128
-};
-
-var Alias = { single: 1, double: 1};
+var Alias = { single: 0, group: 1};
 
 var Mdl = function(name, file) {
     this.name = name;
