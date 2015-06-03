@@ -25,13 +25,14 @@ var Model = function(mdl) {
                 var t = mdl.texCoords[face.indices[v]].t;
 
                 if (!face.isFrontFace && mdl.texCoords[face.indices[v]].onSeam)
-                    s += mdl.skins[0].width * 0.5; // on back side
+                    s += this.skins[0].width * 0.5; // on back side
 
-                data[offset++] = (s + 0.5) / mdl.skins[0].width;
-                data[offset++] = (t + 0.5) / mdl.skins[0].height;
+                data[offset++] = (s + 0.5) / this.skins[0].width;
+                data[offset++] = (t + 0.5) / this.skins[0].height;
             }
         }
     }
+
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
     this.stride = 5 * 4; // x, y, z, s, t
     this.faceCount = mdl.faceCount;

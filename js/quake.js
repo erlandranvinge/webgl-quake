@@ -25,6 +25,7 @@ Quake = function() {};
 var tick = function() {
     requestFrame(tick);
     Quake.instance.tick();
+    //Quake.instance.tick();
 };
 
 Quake.prototype.tick = function() {
@@ -54,8 +55,8 @@ Quake.prototype.tick = function() {
         for (var i = 0; i < statics.length; i++) {
             var modelIndex = statics[i].state.modelIndex;
             var mm = mat4.create(m);
-            mat4.translate(mm, mm, statics[i].state.origin);
-            models[modelIndex].draw(this.projection, mm);
+            mat4.translate(mm, mm, [10, 0, 0]);
+            models[modelIndex].draw(this.projection, mm, 0, 0);
         }
     }
 

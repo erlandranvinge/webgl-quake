@@ -113,9 +113,6 @@ Bsp.prototype.loadSurfaces = function (file, lump) {
         surface.lightMapOffset = file.readInt32();
         surface.flags = 0;
 
-        var texName = this.textures[this.texInfos[surface.texInfoId].textureId].name;
-        console.log(texName);
-
         this.calculateSurfaceExtents(surface);
         this.surfaces.push(surface);
     }

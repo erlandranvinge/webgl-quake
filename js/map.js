@@ -2,7 +2,7 @@ var Texture = require('gl/texture');
 var LightMaps = require('lightmaps');
 var assets = require('assets');
 var utils = require('utils');
-var wireframe = false;
+var wireframe = true;
 
 var blockWidth = 512;
 var blockHeight = 512;
@@ -99,8 +99,6 @@ var Map = function(bsp) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
     this.buffer.stride = 7 * 4;
-
-    console.log(this.lightMaps.texture.asDataUrl());
 };
 
 Map.prototype.draw = function(p, m) {

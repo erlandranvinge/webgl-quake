@@ -13,8 +13,8 @@ var Mdl = function(name, file) {
 Mdl.prototype.loadHeader = function(file) {
     this.id = file.readString(4);
     this.version = file.readUInt32();
-    this.scale = vec3.create([file.readFloat(), file.readFloat(), file.readFloat()]);
-    this.origin = vec3.create([file.readFloat(), file.readFloat(), file.readFloat()]);
+    this.scale = vec3.fromValues(file.readFloat(), file.readFloat(), file.readFloat());
+    this.origin = vec3.fromValues(file.readFloat(), file.readFloat(), file.readFloat());
     this.radius = file.readFloat();
     this.eyePosition = [file.readFloat(), file.readFloat(), file.readFloat()];
     this.skinCount = file.readInt32();
@@ -108,7 +108,6 @@ Mdl.prototype.loadSingleFrame = function(file) {
     frame.poseCount = 1;
     frame.interval = 0;
     for (var v = 0; v < this.vertexCount; v++) {
-
         var vertex = [
             this.scale[0] * file.readUInt8() + this.origin[0],
             this.scale[1] * file.readUInt8() + this.origin[1],
