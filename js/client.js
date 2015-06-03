@@ -115,7 +115,11 @@ Client.prototype.parseServerInfo = function(msg) {
     while(true) {
         var modelName = msg.readCString();
         if (!modelName) break;
-        //console.log(modelName);
+
+        if (modelName[0] == '*' || modelName.indexOf('.spr') !== -1) continue;
+
+        assets.load('pak/' + modelName);
+        console.log(modelName);
     }
     while(true) {
         var soundName = msg.readCString();
