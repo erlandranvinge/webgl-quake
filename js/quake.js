@@ -2,7 +2,6 @@
 var webgl = require('gl/gl');
 var assets = require('assets');
 var utils = require('utils');
-var Map = require('map');
 var Input = require('input');
 var Console = require('ui/console');
 var StatusBar = require('ui/statusbar');
@@ -21,62 +20,76 @@ if (!window.requestFrame) {
     })();
 }
 
-var tick = function() {
-    //requestFrame(tick);
-    Quake.instance.tick();
-};
-
 Quake = function() {};
 
-var angle = 0;
-var position = [0, 0, 0];
+var tick = function() {
+    requestFrame(tick);
+    Quake.instance.tick();
+};
 
 Quake.prototype.tick = function() {
 
     this.client.readFromServer();
-
     this.handleInput();
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
     gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
     var m = utils.quakeIdentity(mat4.create());
-    //mat4.translate(m, m, [100, 100, -20]);
-    mat4.rotateZ(m, m, angle);
-    mat4.translate(m, m, position);
 
-    if (this.map)
-        this.map.draw(this.projection, m);
+    mat4.rotateY(m, m, utils.deg2Rad(this.client.viewAngles[0]));
+    mat4.rotateZ(m, m, utils.deg2Rad(this.client.viewAngles[1]));
 
+    if (this.client.viewEntity !== -1) {
+        var position = this.client.entities[this.client.viewEntity].nextState.origin;
+        mat4.translate(m, m, [-position[0], -position[1], -position[2]]);
+    }
+
+    if (this.client.map) {
+        this.client.map.draw(this.projection, m);
+
+        var statics = this.client.staticEntities;
+        var models = this.client.models;
+
+        for (var i = 0; i < statics.length; i++) {
+            var modelIndex = statics[i].state.modelIndex;
+            var mm = mat4.create(m);
+            mat4.translate(mm, mm, statics[i].state.origin);
+            models[modelIndex].draw(this.projection, mm);
+        }
+    }
 
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.BLEND);
     this.statusBar.draw(this.ortho);
-    //this.console.draw(this.ortho);
 };
 
+// Temp. controller.
 Quake.prototype.handleInput = function() {
-
+    if (this.client.viewEntity === -1)
+        return;
+    var angle = utils.deg2Rad(this.client.viewAngles[1]);
+    var position = this.client.entities[this.client.viewEntity].nextState.origin;
     var speed = 5.0;
 
     if (this.input.left)
-        angle -= 0.04;
+        this.client.viewAngles[1] -= 2;
     if (this.input.right)
-        angle += 0.04;
+        this.client.viewAngles[1] += 2;
     if (this.input.up) {
-        position[0] -= Math.cos(angle) * speed;
-        position[1] += Math.sin(angle) * speed;
-    }
-    if (this.input.down) {
+        this.client.demo = null;
         position[0] += Math.cos(angle) * speed;
         position[1] -= Math.sin(angle) * speed;
     }
+    if (this.input.down) {
+        position[0] -= Math.cos(angle) * speed;
+        position[1] += Math.sin(angle) * speed;
+    }
     if (this.input.flyUp)
-        position[2] -= 10;
-    if (this.input.flyDown)
         position[2] += 10;
+    if (this.input.flyDown)
+        position[2] -= 10;
 };
 
 Quake.prototype.start = function() {
@@ -87,6 +100,7 @@ Quake.prototype.start = function() {
 
     assets.add('data/pak0.pak');
     assets.add('shaders/color2d.shader');
+    assets.add('shaders/model.shader');
     assets.add('shaders/texture2d.shader');
     assets.add('shaders/world.shader');
 

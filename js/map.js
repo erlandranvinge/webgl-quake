@@ -12,7 +12,6 @@ var Map = function(bsp) {
     this.lightMaps = new LightMaps();
     this.lightMaps.build(bsp);
 
-
     for (var texId in bsp.textures) {
         var texture = bsp.textures[texId];
         var options = {

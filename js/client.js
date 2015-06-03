@@ -1,9 +1,26 @@
 var assets = require('assets');
 var Protocol = require('protocol');
+var Map = require('map');
+var Model = require('model');
 
 var Client = function() {
     this.viewAngles = vec3.create();
     this.viewEntity = -1;
+
+    // TEMPORARY.
+    this.map = null;
+    this.entities = [];
+    this.staticEntities = [];
+    this.models = [];
+    for (var i = 0; i < 1024; i++) {
+        var entity = {
+            state: {},
+            baseline: { frame: 0 },
+            priorState: { angles: vec3.create(), origin: vec3.create() },
+            nextState: { angles: vec3.create(), origin: vec3.create() }
+        };
+        this.entities.push(entity);
+    }
 };
 
 Client.prototype.playDemo = function(name) {
@@ -32,6 +49,10 @@ Client.prototype.readFromServer = function() {
         }
 
         switch (cmd) {
+            case Protocol.serverDisconnect:
+                console.log('DISCONNECT!');
+                this.demo = null;
+                return;
             case Protocol.serverUpdateStat:
                 var stat = msg.readUInt8();
                 var value = msg.readInt32();
@@ -61,16 +82,19 @@ Client.prototype.readFromServer = function() {
                 this.parseClientData(msg);
                 break;
             case Protocol.serverUpdateName:
-                console.log('%s. %s', msg.readUInt8(), msg.readCString());
+                var client = msg.readUInt8();
+                var name = msg.readCString();
                 break;
             case Protocol.serverUpdateFrags:
-                console.log('%s. Frags: %s', msg.readUInt8(), msg.readInt16());
+                var client = msg.readUInt8();
+                var frags = msg.readInt16();
                 break;
             case Protocol.serverUpdateColors:
-                console.log('%s. Colors: %s', msg.readUInt8(), msg.readUInt8());
+                var client = msg.readUInt8();
+                var colors = msg.readUInt8();
                 break;
             case Protocol.serverParticle:
-                this.parseParticle();
+                this.parseParticle(msg);
                 break;
             case Protocol.serverStuffText:
                 console.log(msg.readCString());
@@ -88,7 +112,9 @@ Client.prototype.readFromServer = function() {
                 msg.skip(2);
                 break;
             case Protocol.serverSpawnStatic:
-                this.parseBaseline(msg);
+                var baseline = this.parseBaseline(msg);
+                var entity = { state: baseline };
+                this.staticEntities.push(entity);
                 break;
             case Protocol.serverKilledMonster:
                 break;
@@ -98,6 +124,9 @@ Client.prototype.readFromServer = function() {
             case Protocol.serverSpawnBaseline:
                 msg.skip(2);
                 this.parseBaseline(msg);
+                break;
+            case Protocol.serverCenterPrint:
+                console.log('CENTER: ', msg.readCString());
                 break;
             case Protocol.serverSpawnStaticSound:
                 msg.skip(9);
@@ -110,16 +139,24 @@ Client.prototype.readFromServer = function() {
 Client.prototype.parseServerInfo = function(msg) {
     msg.skip(6);
     var mapName = msg.readCString();
-    console.log(mapName);
 
     while(true) {
         var modelName = msg.readCString();
         if (!modelName) break;
 
-        if (modelName[0] == '*' || modelName.indexOf('.spr') !== -1) continue;
+        if (modelName[0] == '*' || modelName.indexOf('.spr') !== -1) {
+            this.models.push(null);
+            continue;
+        }
 
-        assets.load('pak/' + modelName);
-        console.log(modelName);
+        var model = assets.load('pak/' + modelName);
+        if (!this.map) {
+            this.map = new Map(model);
+            this.models.push(this.map);
+        }
+
+        if (modelName.indexOf('.mdl') !== -1)
+            this.models.push(new Model(model));
     }
     while(true) {
         var soundName = msg.readCString();
@@ -165,16 +202,11 @@ Client.prototype.parseFastUpdate = function(cmd, msg) {
     if (cmd & Protocol.fastUpdateMoreBits)
         cmd = cmd | (msg.readUInt8() << 8);
 
-    var entityNumber = (cmd & Protocol.fastUpdateLongEntity) ?
+    var entityNo = (cmd & Protocol.fastUpdateLongEntity) ?
         msg.readInt16() : msg.readUInt8();
 
-    var entity = {
-        state: {},
-        baseline: { frame: 0 },
-        priorState: { angles: [], origin: [] },
-        nextState: { angles: [], origin: [] }
-    };
-    //this.entities[entityNumber];
+
+    var entity = this.entities[entityNo];
     entity.time = this.serverTime;
 
     if (cmd & Protocol.fastUpdateModel) {
@@ -268,7 +300,21 @@ Client.prototype.parseParticle = function(msg) {
 };
 
 Client.prototype.parseBaseline = function(msg) {
-    msg.skip(13);
+    var baseline = {
+        modelIndex: msg.readUInt8(),
+        frame: msg.readUInt8(),
+        colorMap: msg.readUInt8(),
+        skin: msg.readUInt8(),
+        origin: vec3.create(),
+        angles: vec3.create()
+    };
+    baseline.origin[0] = msg.readInt16() * 0.125;
+    baseline.angles[0] = msg.readInt8() * 1.40625;
+    baseline.origin[1] = msg.readInt16() * 0.125;
+    baseline.angles[1] = msg.readInt8() * 1.40625;
+    baseline.origin[2] = msg.readInt16() * 0.125;
+    baseline.angles[2] = msg.readInt8() * 1.40625;
+    return baseline;
 };
 
 module.exports = exports = Client;

@@ -5,12 +5,7 @@ var Wad = require('formats/wad');
 var Palette = require('formats/palette');
 var Bsp = require('formats/bsp');
 var Mdl = require('formats/mdl');
-
-function getExtension(path) {
-    var index = path.lastIndexOf('.');
-    if (index === -1) return '';
-    return path.substr(index + 1);
-}
+var utils = require('utils');
 
 function getName(path) {
     var index1 = path.lastIndexOf('/');
@@ -45,7 +40,7 @@ var Assets = function() {
 };
 
 Assets.prototype.add = function(url, type) {
-    type = type || getExtension(url);
+    type = type || utils.getExtension(url);
     if (!type)
         throw 'Error: Unable to determine type for asset: ' + name;
     var binary = type !== 'shader';
@@ -70,7 +65,7 @@ Assets.prototype.load = function(name, options) {
 
     var index = name.indexOf('/');
     var location = name.substr(0, index);
-    var type = getExtension(name) || 'texture';
+    var type = utils.getExtension(name) || 'texture';
     var name = name.substr(index + 1);
     var options = options || {};
 

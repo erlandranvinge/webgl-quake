@@ -1,5 +1,11 @@
 var Utils = {};
 
+Utils.getExtension = function(path) {
+    var index = path.lastIndexOf('.');
+    if (index === -1) return '';
+    return path.substr(index + 1);
+};
+
 Utils.triangulate = function(points) {
     var result = [];
     points.pop();
@@ -22,6 +28,11 @@ Utils.quakeIdentity = function(a) {
 Utils.deg2Rad = function(degrees) {
     return degrees * Math.PI / 180;
 };
+
+Utils.rad2Deg = function(degrees) {
+    return degrees / Math.PI * 180;
+};
+
 
 Utils.isPowerOf2 = function(x) {
     return (x & (x - 1)) == 0;

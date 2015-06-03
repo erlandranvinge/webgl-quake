@@ -1,4 +1,5 @@
 var LightMap = require('gl/lightmap');
+var Bsp = require('formats/bsp');
 var utils = require('utils');
 
 var maxLightMaps = 64;
@@ -74,13 +75,15 @@ LightMaps.prototype.allocateBlock = function (width, height) {
 };
 
 LightMaps.prototype.build = function(bsp) {
-
     var usedMaps = 0;
     for (var m = 0; m < bsp.models.length; m++) {
         var model = bsp.models[m];
 
         for (var i = 0; i < model.surfaceCount; i++) {
             var surface = bsp.surfaces[model.firstSurface + i];
+            if (surface.flags !== 0) {
+                continue;
+            }
 
             var width = (surface.extents[0] >> 4) + 1;
             var height = (surface.extents[1] >> 4) + 1;

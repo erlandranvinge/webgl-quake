@@ -30,6 +30,11 @@ var Bsp = function(file) {
     this.loadSurfaces(file, header.faces);
 };
 
+Bsp.surfaceFlags = {
+    planeBack: 2, drawSky: 4, drawSprite: 8, drawTurb: 16,
+    drawTiled: 32, drawBackground: 64, underwater: 128
+};
+
 Bsp.prototype.loadVertices = function(file, lump) {
     this.vertexCount = lump.size / 12;
     this.vertices = [];
@@ -107,6 +112,10 @@ Bsp.prototype.loadSurfaces = function (file, lump) {
         surface.lightStyles = [file.readUInt8(), file.readUInt8(), file.readUInt8(), file.readUInt8()];
         surface.lightMapOffset = file.readInt32();
         surface.flags = 0;
+
+        var texName = this.textures[this.texInfos[surface.texInfoId].textureId].name;
+        console.log(texName);
+
         this.calculateSurfaceExtents(surface);
         this.surfaces.push(surface);
     }
