@@ -2,6 +2,7 @@ var assets = require('assets');
 var Protocol = require('protocol');
 var Map = require('map');
 var Model = require('model');
+var utils = require('utils');
 
 var Client = function() {
     this.viewAngles = vec3.create();
@@ -10,11 +11,11 @@ var Client = function() {
     // TEMPORARY.
     this.map = null;
     this.entities = [];
-    this.staticEntities = [];
-    this.models = [];
+    this.statics = [];
+    this.models = ['dummy'];
     for (var i = 0; i < 1024; i++) {
         var entity = {
-            state: {},
+            state: { angles: vec3.create(), origin: vec3.create() },
             baseline: { frame: 0 },
             priorState: { angles: vec3.create(), origin: vec3.create() },
             nextState: { angles: vec3.create(), origin: vec3.create() }
@@ -114,7 +115,7 @@ Client.prototype.readFromServer = function() {
             case Protocol.serverSpawnStatic:
                 var baseline = this.parseBaseline(msg);
                 var entity = { state: baseline };
-                this.staticEntities.push(entity);
+                this.statics.push(entity);
                 break;
             case Protocol.serverKilledMonster:
                 break;
@@ -122,8 +123,8 @@ Client.prototype.readFromServer = function() {
                 this.parseDamage(msg);
                 break;
             case Protocol.serverSpawnBaseline:
-                msg.skip(2);
-                this.parseBaseline(msg);
+                var entityNo = msg.readInt16();
+                this.entities[entityNo].state = this.parseBaseline(msg);
                 break;
             case Protocol.serverCenterPrint:
                 console.log('CENTER: ', msg.readCString());
@@ -136,6 +137,12 @@ Client.prototype.readFromServer = function() {
     }
 };
 
+
+Client.prototype.update = function(time) {
+
+    this.readFromServer();
+};
+
 Client.prototype.parseServerInfo = function(msg) {
     msg.skip(6);
     var mapName = msg.readCString();
@@ -143,20 +150,21 @@ Client.prototype.parseServerInfo = function(msg) {
     while(true) {
         var modelName = msg.readCString();
         if (!modelName) break;
+        var type = utils.getExtension(modelName);
+        switch (type) {
+            case 'bsp':
+                var model = new Map(assets.load('pak/' + modelName));
+                this.models.push(model);
+                if (!this.map) { this.map = model; }
+                break;
+            case 'mdl':
+                this.models.push(new Model(assets.load('pak/' + modelName)));
+                break;
+            default:
+                this.models.push(null);
+                break;
 
-        if (modelName[0] == '*' || modelName.indexOf('.spr') !== -1) {
-            this.models.push(null);
-            continue;
         }
-
-        var model = assets.load('pak/' + modelName);
-        if (!this.map) {
-            this.map = new Map(model);
-            this.models.push(this.map);
-        }
-
-        if (modelName.indexOf('.mdl') !== -1)
-            this.models.push(new Model(model));
     }
     while(true) {
         var soundName = msg.readCString();
@@ -211,7 +219,6 @@ Client.prototype.parseFastUpdate = function(cmd, msg) {
 
     if (cmd & Protocol.fastUpdateModel) {
         entity.state.modelIndex = msg.readUInt8();
-        entity.model = 0;//this.models[entity.state.modelIndex];
     }
     if (cmd & Protocol.fastUpdateFrame)
         entity.state.frame = msg.readUInt8();

@@ -37,8 +37,8 @@ Mdl.prototype.loadSkins = function(file) {
         if (group !== Alias.single) {
             console.log('Warning: Multiple skins not supported yet.');
         }
+        var data = file.read(this.skinWidth * this.skinHeight);
 
-        var data = file.readString(this.skinWidth * this.skinHeight);
         this.skins.push(data);
     }
 };

@@ -22,41 +22,54 @@ if (!window.requestFrame) {
 
 Quake = function() {};
 
-var tick = function() {
+var tick = function(time) {
     requestFrame(tick);
-    Quake.instance.tick();
-    //Quake.instance.tick();
+    Quake.instance.tick(time);
 };
 
-Quake.prototype.tick = function() {
+Quake.prototype.tick = function(time) {
 
-    this.client.readFromServer();
+    this.client.update(time);
     this.handleInput();
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
     var m = utils.quakeIdentity(mat4.create());
-
     mat4.rotateY(m, m, utils.deg2Rad(this.client.viewAngles[0]));
     mat4.rotateZ(m, m, utils.deg2Rad(this.client.viewAngles[1]));
 
     if (this.client.viewEntity !== -1) {
-        var position = this.client.entities[this.client.viewEntity].nextState.origin;
-        mat4.translate(m, m, [-position[0], -position[1], -position[2]]);
-    }
+        var pos = this.client.entities[this.client.viewEntity].nextState.origin;
+        mat4.translate(m, m, [-pos[0], -pos[1], -pos[2]]);
 
-    if (this.client.map) {
-        this.client.map.draw(this.projection, m);
+        if (this.client.map) {
+            this.client.map.draw(this.projection, m);
 
-        var statics = this.client.staticEntities;
-        var models = this.client.models;
+            var models = this.client.models;
 
-        for (var i = 0; i < statics.length; i++) {
-            var modelIndex = statics[i].state.modelIndex;
-            var mm = mat4.create(m);
-            mat4.translate(mm, mm, [10, 0, 0]);
-            models[modelIndex].draw(this.projection, mm, 0, 0);
+            var mm = mat4.create();
+
+            var statics = this.client.statics;
+            for (var i = 0; i < statics.length; i++) {
+                var state = statics[i].state;
+                var model = models[state.modelIndex];
+                var mm = mat4.translate(mm, m, state.origin);
+                model.draw(this.projection, mm, 0, 0);
+            }
+
+            var entities = this.client.entities;
+            for (var i = 0; i < entities.length; i++) {
+                var state = entities[i].state;
+                var model = models[state.modelIndex];
+                if (model) {
+                    try {
+                        var mm = mat4.translate(mm, m, state.origin);
+                        model.draw(this.projection, mm, 0, 0);
+                    } catch (e) { console.log(i, state); }
+                }
+            }
+
         }
     }
 
@@ -111,10 +124,7 @@ Quake.prototype.start = function() {
         self.statusBar = new StatusBar();
         self.input = new Input();
         self.client = new Client();
-
-        //var bsp = assets.load('pak/maps/start.bsp');
-        //self.map = new Map(bsp);
-        self.client.playDemo('demo1.dem');
+        self.client.playDemo('demo2.dem');
         tick();
     });
 };

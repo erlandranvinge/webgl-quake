@@ -2,7 +2,7 @@ var Texture = require('gl/texture');
 var LightMaps = require('lightmaps');
 var assets = require('assets');
 var utils = require('utils');
-var wireframe = true;
+var wireframe = false;
 
 var blockWidth = 512;
 var blockHeight = 512;

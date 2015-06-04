@@ -5,7 +5,12 @@ var Model = function(mdl) {
     this.skins = [];
     for (var skinIndex = 0; skinIndex < mdl.skins.length; skinIndex++) {
         var skin = mdl.skins[skinIndex];
-        this.skins.push(new Texture(skin.data, { width: mdl.skinWidth, height: mdl.skinHeight }));
+        var texture = new Texture(skin, {
+            palette: assets.palette,
+            width: mdl.skinWidth,
+            height: mdl.skinHeight
+        });
+        this.skins.push(texture);
     }
 
     this.id = gl.createBuffer();
@@ -58,7 +63,7 @@ Model.prototype.draw = function(p, m, frame, animation) {
         frame = 0;
 
     gl.uniform1i(shader.uniforms.textureMap, 0);
-    gl.drawArrays(gl.TRIANGLES, ~ ~frame * (this.faceCount * 3), this.faceCount * 3);
+    gl.drawArrays(gl.TRIANGLES, ~~frame * (this.faceCount * 3), this.faceCount * 3);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 };
 
