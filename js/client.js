@@ -8,6 +8,7 @@ var Client = function() {
     this.viewAngles = vec3.create();
     this.viewEntity = -1;
 
+
     // TEMPORARY.
     this.map = null;
     this.entities = [];
@@ -122,6 +123,8 @@ Client.prototype.readFromServer = function() {
             case Protocol.serverDamage:
                 this.parseDamage(msg);
                 break;
+            case Protocol.serverFoundSecret:
+                break;
             case Protocol.serverSpawnBaseline:
                 var entityNo = msg.readInt16();
                 this.entities[entityNo].state = this.parseBaseline(msg);
@@ -137,9 +140,7 @@ Client.prototype.readFromServer = function() {
     }
 };
 
-
 Client.prototype.update = function(time) {
-
     this.readFromServer();
 };
 
@@ -273,6 +274,7 @@ Client.prototype.parseTempEntity = function(msg) {
         case Protocol.tempGunShot:
         case Protocol.tempWizSpike:
         case Protocol.tempSpike:
+        case Protocol.tempSuperSpike:
         case Protocol.tempExplosion:
             pos[0] = msg.readInt16() * 0.125;
             pos[1] = msg.readInt16() * 0.125;
