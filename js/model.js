@@ -44,10 +44,10 @@ var Model = function(mdl) {
     this.animations = mdl.animations;
 };
 
-Model.prototype.draw = function(p, m, frame, animation) {
+Model.prototype.draw = function(p, m, animation, frame) {
     var shader = assets.shaders.model;
-    frame = frame | 0;
     animation = animation | 0;
+    frame = frame | 0;
     shader.use();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.id);

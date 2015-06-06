@@ -36,8 +36,8 @@ Quake.prototype.tick = function(time) {
     gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
     var m = utils.quakeIdentity(mat4.create());
-    mat4.rotateY(m, m, utils.deg2Rad(this.client.viewAngles[0]));
-    mat4.rotateZ(m, m, utils.deg2Rad(this.client.viewAngles[1]));
+    mat4.rotateY(m, m, utils.deg2Rad(-this.client.viewAngles[0]));
+    mat4.rotateZ(m, m, utils.deg2Rad(-this.client.viewAngles[1]));
 
     if (this.client.viewEntity !== -1) {
         var pos = this.client.entities[this.client.viewEntity].nextState.origin;
@@ -60,13 +60,18 @@ Quake.prototype.tick = function(time) {
 
             var entities = this.client.entities;
             for (var i = 0; i < entities.length; i++) {
+                if (i === this.client.viewEntity)
+                    continue;
+
                 var state = entities[i].state;
                 var model = models[state.modelIndex];
                 if (model) {
                     try {
                         var mm = mat4.translate(mm, m, state.origin);
-                        model.draw(this.projection, mm, 0, 0);
-                    } catch (e) { console.log(i, state); }
+                        mat4.rotateZ(mm, mm, utils.deg2Rad(state.angles[1]));
+
+                        model.draw(this.projection, mm, 0, state.frame);
+                    } catch (e) { console.log(e); }
                 }
             }
 
@@ -124,7 +129,7 @@ Quake.prototype.start = function() {
         self.statusBar = new StatusBar();
         self.input = new Input();
         self.client = new Client();
-        self.client.playDemo('demo2.dem');
+        self.client.playDemo('demo1.dem');
         tick();
     });
 };

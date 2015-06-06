@@ -5,8 +5,11 @@ var Model = require('model');
 var utils = require('utils');
 
 var Client = function() {
+    this.priorViewAngles = vec3.create();
     this.viewAngles = vec3.create();
+    this.nextViewAngles = vec3.create();
     this.viewEntity = -1;
+    this.time = { serverTime: -1, oldClientTime: -1, clientTime: -1 };
 
 
     // TEMPORARY.
@@ -17,7 +20,6 @@ var Client = function() {
     for (var i = 0; i < 1024; i++) {
         var entity = {
             state: { angles: vec3.create(), origin: vec3.create() },
-            baseline: { frame: 0 },
             priorState: { angles: vec3.create(), origin: vec3.create() },
             nextState: { angles: vec3.create(), origin: vec3.create() }
         };
@@ -37,9 +39,10 @@ Client.prototype.readFromServer = function() {
 
     var messageSize = demo.readInt32();
 
-    this.viewAngles[0] = demo.readFloat();
-    this.viewAngles[1] = demo.readFloat();
-    this.viewAngles[2] = demo.readFloat();
+    for (var i = 0; i < 3; i++) {
+        this.priorViewAngles[i] = this.nextViewAngles[i];
+        this.nextViewAngles[i] = demo.readFloat();
+    }
 
     var msg = demo.read(messageSize);
     var cmd = 0;
@@ -63,7 +66,7 @@ Client.prototype.readFromServer = function() {
                 this.viewEntity = msg.readInt16();
                 break;
             case Protocol.serverTime:
-                msg.readFloat();
+                this.time.serverTime = msg.readFloat();
                 break;
             case Protocol.serverSetAngle:
                 this.viewAngles[0] = msg.readInt8() * 1.40625;
@@ -141,7 +144,35 @@ Client.prototype.readFromServer = function() {
 };
 
 Client.prototype.update = function(time) {
-    this.readFromServer();
+    this.time.oldClientTime = this.time.clientTime;
+    this.time.clientTime = time / 1000;
+
+    if (this.time.clientTime > this.time.serverTime)
+        this.readFromServer();
+
+
+    var dt = this.time.clientTime - this.time.oldClientTime;
+
+    for (var a = 0; a < 3; a++) {
+        var deltaAngle = this.nextViewAngles[a] - this.priorViewAngles[a];
+        if (deltaAngle > 180)
+            deltaAngle -= 360;
+        else if (deltaAngle < -180)
+            deltaAngle += 360;
+        this.viewAngles[a] = this.priorViewAngles[a] + deltaAngle * dt;
+    }
+
+
+    // TODO: Move to entities.js or similar.
+    for (var i = 0; i < this.entities.length; i++) {
+        var entity = this.entities[i];
+        for (var j = 0; j < 3; j++) {
+            entity.state.origin[j] = entity.priorState.origin[j] +
+            (entity.nextState.origin[j] - entity.priorState.origin[j]) * dt;
+            entity.state.angles[j] = entity.priorState.angles[j] +
+            (entity.nextState.angles[j] - entity.priorState.angles[j]) * dt;
+        }
+    }
 };
 
 Client.prototype.parseServerInfo = function(msg) {
@@ -223,8 +254,8 @@ Client.prototype.parseFastUpdate = function(cmd, msg) {
     }
     if (cmd & Protocol.fastUpdateFrame)
         entity.state.frame = msg.readUInt8();
-    else
-        entity.state.frame = entity.baseline.frame;
+    //else
+    //    entity.state.frame = entity.baseline.frame;
 
     if (cmd & Protocol.fastUpdateColorMap)
         msg.readUInt8();
