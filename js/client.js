@@ -275,12 +275,13 @@ Client.prototype.parseTempEntity = function(msg) {
         case Protocol.tempWizSpike:
         case Protocol.tempSpike:
         case Protocol.tempSuperSpike:
-        case Protocol.tempExplosion:
+		case Protocol.tempTeleport:
+		case Protocol.tempExplosion:
             pos[0] = msg.readInt16() * 0.125;
             pos[1] = msg.readInt16() * 0.125;
             pos[2] = msg.readInt16() * 0.125;
             break;
-        default:
+		default:
             throw 'Unknown temp. entity encountered: ' + type;
     }
 };
