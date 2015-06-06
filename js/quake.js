@@ -35,10 +35,19 @@ Quake.prototype.tick = function(time) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
-    var m = utils.quakeIdentity(mat4.create());
-    mat4.rotateY(m, m, utils.deg2Rad(-this.client.viewAngles[0]));
-    mat4.rotateZ(m, m, utils.deg2Rad(-this.client.viewAngles[1]));
 
+    if (this.client.viewEntity !== -1) {
+        var entity = this.client.entities[this.client.viewEntity];
+        var origin = entity.state.origin;
+        var angles = entity.state.angles;
+        var m = utils.quakeIdentity(mat4.create());
+        mat4.rotateY(m, m, utils.deg2Rad(-angles[0]));
+        mat4.rotateZ(m, m, utils.deg2Rad(-angles[1]));
+        mat4.translate(m, m, [-origin[0], -origin[1], -origin[2]]);
+        this.client.map.draw(this.projection, m);
+    }
+
+    /*
     if (this.client.viewEntity !== -1) {
         var pos = this.client.entities[this.client.viewEntity].nextState.origin;
         mat4.translate(m, m, [-pos[0], -pos[1], -pos[2]]);
@@ -77,7 +86,7 @@ Quake.prototype.tick = function(time) {
 
         }
     }
-
+    */
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.BLEND);
@@ -88,6 +97,8 @@ Quake.prototype.tick = function(time) {
 Quake.prototype.handleInput = function() {
     if (this.client.viewEntity === -1)
         return;
+
+    /*
     var angle = utils.deg2Rad(this.client.viewAngles[1]);
     var position = this.client.entities[this.client.viewEntity].nextState.origin;
     var speed = 5.0;
@@ -109,6 +120,7 @@ Quake.prototype.handleInput = function() {
         position[2] += 10;
     if (this.input.flyDown)
         position[2] -= 10;
+    */
 };
 
 Quake.prototype.start = function() {

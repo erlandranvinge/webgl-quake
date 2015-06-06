@@ -5,12 +5,8 @@ var Model = require('model');
 var utils = require('utils');
 
 var Client = function() {
-    this.priorViewAngles = vec3.create();
-    this.viewAngles = vec3.create();
-    this.nextViewAngles = vec3.create();
     this.viewEntity = -1;
-    this.time = { serverTime: -1, oldClientTime: -1, clientTime: -1 };
-
+    this.time = { oldServerTime: 0, serverTime: 0, oldClientTime: 0, clientTime: 0 };
 
     // TEMPORARY.
     this.map = null;
@@ -39,9 +35,10 @@ Client.prototype.readFromServer = function() {
 
     var messageSize = demo.readInt32();
 
-    for (var i = 0; i < 3; i++) {
-        this.priorViewAngles[i] = this.nextViewAngles[i];
-        this.nextViewAngles[i] = demo.readFloat();
+    var angles = [demo.readFloat(), demo.readFloat(), demo.readFloat()];
+    if (this.viewEntity !== -1) {
+        //var entity = this.entities[this.viewEntity];
+        //vec3.set(entity.state.angles, angles[0], angles[1], angles[1]);
     }
 
     var msg = demo.read(messageSize);
@@ -66,12 +63,13 @@ Client.prototype.readFromServer = function() {
                 this.viewEntity = msg.readInt16();
                 break;
             case Protocol.serverTime:
+                this.time.oldServerTime = this.time.serverTime;
                 this.time.serverTime = msg.readFloat();
                 break;
             case Protocol.serverSetAngle:
-                this.viewAngles[0] = msg.readInt8() * 1.40625;
-                this.viewAngles[1] = msg.readInt8() * 1.40625;
-                this.viewAngles[2] = msg.readInt8() * 1.40625;
+                var x = msg.readInt8() * 1.40625;
+                var y = msg.readInt8() * 1.40625;
+                var z = msg.readInt8() * 1.40625;
                 break;
             case Protocol.serverSound:
                 this.parseSound(msg);
@@ -144,33 +142,32 @@ Client.prototype.readFromServer = function() {
 };
 
 Client.prototype.update = function(time) {
+    if (!time) return;
+
     this.time.oldClientTime = this.time.clientTime;
     this.time.clientTime = time / 1000;
 
     if (this.time.clientTime > this.time.serverTime)
         this.readFromServer();
 
-
-    var dt = this.time.clientTime - this.time.oldClientTime;
-
-    for (var a = 0; a < 3; a++) {
-        var deltaAngle = this.nextViewAngles[a] - this.priorViewAngles[a];
-        if (deltaAngle > 180)
-            deltaAngle -= 360;
-        else if (deltaAngle < -180)
-            deltaAngle += 360;
-        this.viewAngles[a] = this.priorViewAngles[a] + deltaAngle * dt;
+    var serverDelta = this.time.serverTime - this.time.oldServerTime || 0.1;
+    if (serverDelta > 0.1) {
+        this.time.oldServerTime = this.time.serverTime - 0.1;
+        serverDelta = 0.1;
     }
+    var dt = (this.time.clientTime - this.time.oldServerTime) / serverDelta;
+    if (dt > 1.0) dt = 1.0;
 
+    if (this.viewEntity !== -1) {
+        var e = this.entities[this.viewEntity];
+        for (var i = 0; i < 3; i++) {
+            var dp = e.nextState.origin[i] - e.priorState.origin[i];
+            e.state.origin[i] = e.priorState.origin[i] + dp * dt;
 
-    // TODO: Move to entities.js or similar.
-    for (var i = 0; i < this.entities.length; i++) {
-        var entity = this.entities[i];
-        for (var j = 0; j < 3; j++) {
-            entity.state.origin[j] = entity.priorState.origin[j] +
-            (entity.nextState.origin[j] - entity.priorState.origin[j]) * dt;
-            entity.state.angles[j] = entity.priorState.angles[j] +
-            (entity.nextState.angles[j] - entity.priorState.angles[j]) * dt;
+            var da = e.nextState.angles[i] - e.priorState.angles[i];
+            if (da > 180) da -= 360;
+            else if (da < -180) da += 360;
+            e.state.angles[i] = e.priorState.angles[i] + da * dt;
         }
     }
 };
