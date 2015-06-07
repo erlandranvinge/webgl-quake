@@ -7,6 +7,6 @@ body {
 
 canvas {
     /*cursor: none;*/
-    width: 75%;
-    height: 75%;
+    width: 100%;
+    height: 100%;
 }

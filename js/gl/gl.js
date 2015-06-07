@@ -12,6 +12,9 @@ gl.init = function(id) {
     var gl = canvas.getContext('webgl', options);
     if (!gl)
         throw 'Error: No WebGL support found.';
+	canvas.width  = window.innerWidth;
+	canvas.height = window.innerHeight;
+
 
     gl.width = canvas.width;
     gl.height = canvas.height;

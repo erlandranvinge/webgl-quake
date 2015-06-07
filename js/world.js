@@ -70,7 +70,7 @@ World.prototype.draw = function(p, viewEntity) {
     var angles = entity.state.angles;
     mat4.rotateY(m, m, utils.deg2Rad(-angles[0]));
     mat4.rotateZ(m, m, utils.deg2Rad(-angles[1]));
-    mat4.translate(m, m, [-origin[0], -origin[1], -origin[2]]);
+    mat4.translate(m, m, [-origin[0], -origin[1], -origin[2] - 22]);
     this.map.draw(p, m);
 
     this.drawStatics(p, m);

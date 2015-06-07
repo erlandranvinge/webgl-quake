@@ -1,7 +1,6 @@
 
 var webgl = require('gl/gl');
 var assets = require('assets');
-var utils = require('utils');
 var Input = require('input');
 var Console = require('ui/console');
 var StatusBar = require('ui/statusbar');
@@ -93,7 +92,7 @@ Quake.prototype.start = function() {
         self.statusBar = new StatusBar();
         self.input = new Input();
         self.client = new Client();
-        self.client.playDemo('demo1.dem');
+        self.client.playDemo('demo2.dem');
         tick();
     });
 };
