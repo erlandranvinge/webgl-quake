@@ -39,49 +39,6 @@ Quake.prototype.tick = function(time) {
     if (this.client.viewEntity > 0)
         this.client.world.draw(this.projection, this.client.viewEntity);
 
-    /*
-
-    */
-    /*
-    if (this.client.viewEntity !== -1) {
-        var pos = this.client.entities[this.client.viewEntity].nextState.origin;
-        mat4.translate(m, m, [-pos[0], -pos[1], -pos[2]]);
-
-        if (this.client.map) {
-            this.client.map.draw(this.projection, m);
-
-            var models = this.client.models;
-
-            var mm = mat4.create();
-
-            var statics = this.client.statics;
-            for (var i = 0; i < statics.length; i++) {
-                var state = statics[i].state;
-                var model = models[state.modelIndex];
-                var mm = mat4.translate(mm, m, state.origin);
-                model.draw(this.projection, mm, 0, 0);
-            }
-
-            var entities = this.client.entities;
-            for (var i = 0; i < entities.length; i++) {
-                if (i === this.client.viewEntity)
-                    continue;
-
-                var state = entities[i].state;
-                var model = models[state.modelIndex];
-                if (model) {
-                    try {
-                        var mm = mat4.translate(mm, m, state.origin);
-                        mat4.rotateZ(mm, mm, utils.deg2Rad(state.angles[1]));
-
-                        model.draw(this.projection, mm, 0, state.frame);
-                    } catch (e) { console.log(e); }
-                }
-            }
-
-        }
-    }
-    */
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.BLEND);
