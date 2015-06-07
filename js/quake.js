@@ -36,17 +36,12 @@ Quake.prototype.tick = function(time) {
     gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
 
-    if (this.client.viewEntity !== -1) {
-        var entity = this.client.entities[this.client.viewEntity];
-        var origin = entity.state.origin;
-        var angles = entity.state.angles;
-        var m = utils.quakeIdentity(mat4.create());
-        mat4.rotateY(m, m, utils.deg2Rad(-angles[0]));
-        mat4.rotateZ(m, m, utils.deg2Rad(-angles[1]));
-        mat4.translate(m, m, [-origin[0], -origin[1], -origin[2]]);
-        this.client.map.draw(this.projection, m);
-    }
+    if (this.client.viewEntity > 0)
+        this.client.world.draw(this.projection, this.client.viewEntity);
 
+    /*
+
+    */
     /*
     if (this.client.viewEntity !== -1) {
         var pos = this.client.entities[this.client.viewEntity].nextState.origin;

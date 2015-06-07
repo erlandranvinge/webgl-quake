@@ -1,26 +1,11 @@
 var assets = require('assets');
 var Protocol = require('protocol');
-var Map = require('map');
-var Model = require('model');
-var utils = require('utils');
+var World = require('world');
 
 var Client = function() {
     this.viewEntity = -1;
     this.time = { oldServerTime: 0, serverTime: 0, oldClientTime: 0, clientTime: 0 };
-
-    // TEMPORARY.
-    this.map = null;
-    this.entities = [];
-    this.statics = [];
-    this.models = ['dummy'];
-    for (var i = 0; i < 1024; i++) {
-        var entity = {
-            state: { angles: vec3.create(), origin: vec3.create() },
-            priorState: { angles: vec3.create(), origin: vec3.create() },
-            nextState: { angles: vec3.create(), origin: vec3.create() }
-        };
-        this.entities.push(entity);
-    }
+    this.world = new World();
 };
 
 Client.prototype.playDemo = function(name) {
@@ -115,9 +100,7 @@ Client.prototype.readFromServer = function() {
                 msg.skip(2);
                 break;
             case Protocol.serverSpawnStatic:
-                var baseline = this.parseBaseline(msg);
-                var entity = { state: baseline };
-                this.statics.push(entity);
+                this.world.spawnStatic(this.parseBaseline(msg));
                 break;
             case Protocol.serverKilledMonster:
                 break;
@@ -127,8 +110,7 @@ Client.prototype.readFromServer = function() {
             case Protocol.serverFoundSecret:
                 break;
             case Protocol.serverSpawnBaseline:
-                var entityNo = msg.readInt16();
-                this.entities[entityNo].state = this.parseBaseline(msg);
+                this.world.spawnEntity(msg.readInt16(), this.parseBaseline(msg));
                 break;
             case Protocol.serverCenterPrint:
                 console.log('CENTER: ', msg.readCString());
@@ -158,18 +140,8 @@ Client.prototype.update = function(time) {
     var dt = (this.time.clientTime - this.time.oldServerTime) / serverDelta;
     if (dt > 1.0) dt = 1.0;
 
-    if (this.viewEntity !== -1) {
-        var e = this.entities[this.viewEntity];
-        for (var i = 0; i < 3; i++) {
-            var dp = e.nextState.origin[i] - e.priorState.origin[i];
-            e.state.origin[i] = e.priorState.origin[i] + dp * dt;
+    this.world.update(dt);
 
-            var da = e.nextState.angles[i] - e.priorState.angles[i];
-            if (da > 180) da -= 360;
-            else if (da < -180) da += 360;
-            e.state.angles[i] = e.priorState.angles[i] + da * dt;
-        }
-    }
 };
 
 Client.prototype.parseServerInfo = function(msg) {
@@ -179,21 +151,7 @@ Client.prototype.parseServerInfo = function(msg) {
     while(true) {
         var modelName = msg.readCString();
         if (!modelName) break;
-        var type = utils.getExtension(modelName);
-        switch (type) {
-            case 'bsp':
-                var model = new Map(assets.load('pak/' + modelName));
-                this.models.push(model);
-                if (!this.map) { this.map = model; }
-                break;
-            case 'mdl':
-                this.models.push(new Model(assets.load('pak/' + modelName)));
-                break;
-            default:
-                this.models.push(null);
-                break;
-
-        }
+        this.world.loadModel(modelName);
     }
     while(true) {
         var soundName = msg.readCString();
@@ -243,7 +201,8 @@ Client.prototype.parseFastUpdate = function(cmd, msg) {
         msg.readInt16() : msg.readUInt8();
 
 
-    var entity = this.entities[entityNo];
+    // TODO: Move entity fast updates into world.js.
+    var entity = this.world.entities[entityNo];
     entity.time = this.serverTime;
 
     if (cmd & Protocol.fastUpdateModel) {
