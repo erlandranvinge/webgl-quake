@@ -96,7 +96,7 @@ World.prototype.drawEntities = function(p, m, viewEntity) {
         var state = this.entities[e].state;
         var model = this.models[state.modelIndex];
         if (model) {
-            var mm = mat4.translate(mm, m, state.origin);
+            mm = mat4.translate(mm, m, state.origin);
             mat4.rotateZ(mm, mm, utils.deg2Rad(state.angles[1]));
             model.draw(p, mm, 0, state.frame);
         }
