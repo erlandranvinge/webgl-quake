@@ -1,6 +1,6 @@
 ## webgl-quake
 
-A quake engine renderer built ground-up in javascript. 
+A quake engine renderer built ground-up in javascript. Relying on browserify and gulp for dependency-mgmt and packaging. 
 
 **Get started:**
 
