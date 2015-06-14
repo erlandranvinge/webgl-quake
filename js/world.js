@@ -50,7 +50,6 @@ World.prototype.update = function(dt) {
 
     for (var e = 0; e < this.entities.length; e++) {
         var entity = this.entities[e];
-        console.log(entity.time);
         if (!entity) continue;
 
         for (var c = 0; c < 3; c++) {

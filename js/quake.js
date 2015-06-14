@@ -1,6 +1,7 @@
 
 var webgl = require('gl/gl');
 var assets = require('assets');
+var installer = require('installer/installer');
 var Input = require('input');
 var Console = require('ui/console');
 var StatusBar = require('ui/statusbar');
@@ -80,6 +81,10 @@ Quake.prototype.handleInput = function() {
 };
 
 Quake.prototype.start = function() {
+
+    installer.start('http://www.gamers.org/pub/games/quake/idstuff/quake/quake106.zip');
+
+    /*
     Quake.instance = this;
     webgl.init('canvas');
     this.ortho = mat4.ortho(mat4.create(), 0, gl.width, gl.height, 0, -10, 10);
@@ -99,7 +104,7 @@ Quake.prototype.start = function() {
         self.client = new Client();
         self.client.playDemo('demo2.dem');
         tick();
-    });
+    });  */
 };
 
 
