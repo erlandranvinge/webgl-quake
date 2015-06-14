@@ -11,6 +11,7 @@ var World = function() {
 
     for (var i = 0; i < 1024; i++) {
         var entity = {
+            time: 0,
             state: { angles: vec3.create(), origin: vec3.create() },
             priorState: { angles: vec3.create(), origin: vec3.create() },
             nextState: { angles: vec3.create(), origin: vec3.create() }
@@ -49,6 +50,7 @@ World.prototype.update = function(dt) {
 
     for (var e = 0; e < this.entities.length; e++) {
         var entity = this.entities[e];
+        console.log(entity.time);
         if (!entity) continue;
 
         for (var c = 0; c < 3; c++) {

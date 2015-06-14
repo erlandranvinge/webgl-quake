@@ -141,7 +141,6 @@ Client.prototype.update = function(time) {
     if (dt > 1.0) dt = 1.0;
 
     this.world.update(dt);
-
 };
 
 Client.prototype.parseServerInfo = function(msg) {
