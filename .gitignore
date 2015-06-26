@@ -1,7 +1,7 @@
 .idea
 .DS_Store
 node_modules
-data
+data/*.[pP][aA][kK]
 
 
 
