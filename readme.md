@@ -10,9 +10,10 @@ I use GitHub pages to host a demo of the current progress. The test application 
 [Quake WebGL demo](http://erlandranvinge.github.io/webgl-quake/)
 
 ### Getting started with the code:
-1. Clone the repository.  
-2. Place the PAK data files (e.g. PAK0.pak or similar depending on quake version)  in the data folder.  
-3. Start the game using node/gulp with the commands listed below:  
+1. Make sure you have node/npm readily available. 
+2. Clone the repository.  
+3. Place the PAK data files (e.g. PAK0.pak or similar depending on quake version)  in the data folder.  
+4. Start the game using node/gulp with the commands listed below:  
 
 ```
 npm install
