@@ -12,15 +12,11 @@
     </canvas>
     <div id="dialog">
         <p>Initiating download...</p>
-        <div class="progress">
-            <div class="bar"></div>
-        </div>
+        <button onclick="quake.start()">RETRY</button>
     </div>
     <script>
         var quake = new Quake();
-        quake.install(function() {
-            quake.start();
-        });
+        quake.start();
     </script>
 </body>
 </html>

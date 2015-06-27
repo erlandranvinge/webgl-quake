@@ -23,13 +23,8 @@ if (!window.requestFrame) {
 Quake = function() {};
 
 var tick = function(time) {
-    //requestFrame(tick);
-
-
-    for (var i = 0; i < 200; i++)
+    requestFrame(tick);
     Quake.instance.tick(time);
-
-
 };
 
 Quake.prototype.tick = function(time) {
@@ -80,36 +75,27 @@ Quake.prototype.handleInput = function() {
     */
 };
 
-Quake.prototype.install = function(done) {
-    installer.start(function() {
-
-    });
-};
-
 Quake.prototype.start = function() {
-
-
-    /*
     Quake.instance = this;
     webgl.init('canvas');
     this.ortho = mat4.ortho(mat4.create(), 0, gl.width, gl.height, 0, -10, 10);
     this.projection = mat4.perspective(mat4.create(), 68.03, gl.width / gl.height, 0.1, 4096);
 
-    assets.add('data/pak0.pak');
-    assets.add('shaders/color2d.shader');
-    assets.add('shaders/model.shader');
-    assets.add('shaders/texture2d.shader');
-    assets.add('shaders/world.shader');
-
     var self = this;
-    assets.precache(function() {
-        self.console = new Console();
-        self.statusBar = new StatusBar();
-        self.input = new Input();
-        self.client = new Client();
-        self.client.playDemo('demo2.dem');
-        tick();
-    });  */
+    installer.start(function(pak) {
+        assets.add('shaders/color2d.shader');
+        assets.add('shaders/model.shader');
+        assets.add('shaders/texture2d.shader');
+        assets.add('shaders/world.shader');
+        assets.precache(function() {
+            self.console = new Console();
+            self.statusBar = new StatusBar();
+            self.input = new Input();
+            self.client = new Client();
+            self.client.playDemo('demo2.dem');
+            tick();
+        });
+    });
 };
 
 

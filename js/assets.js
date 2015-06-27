@@ -47,13 +47,14 @@ Assets.prototype.add = function(url, type) {
     this.pending.push({ url: url, name: getName(url), type: type, binary: binary });
 };
 
+Assets.prototype.setPak = function(data) {
+    this.pak = new Pak(data);
+    this.wad = new Wad(this.pak.load('gfx.wad'));
+    this.palette = new Palette(this.pak.load('gfx/palette.lmp'));
+};
+
 Assets.prototype.insert = function(item, data) {
     switch (item.type) {
-        case 'pak':
-            this.pak = new Pak(data);
-            this.wad = new Wad(this.pak.load('gfx.wad'));
-            this.palette = new Palette(this.pak.load('gfx/palette.lmp'));
-            break;
         case 'shader':
             this.shaders[item.name] = new Shader(data);
             break;

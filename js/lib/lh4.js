@@ -45,6 +45,7 @@ LhaArrayReader.prototype.readUInt16 = function() {
     this.offset += 2;
     return value;
 };
+
 LhaArrayReader.prototype.readUInt32 = function() {
     if (this.offset + 4 >= this.buffer.length)
         return -1;
@@ -56,6 +57,7 @@ LhaArrayReader.prototype.readUInt32 = function() {
     this.offset += 4;
     return value;
 };
+
 LhaArrayReader.prototype.readString = function(size) {
     if (this.offset + size >= this.buffer.length)
         return -1;
@@ -289,13 +291,14 @@ LhaReader.prototype.extract = function(id, callback) {
     var entry = this.entries[id];
     this.reader.seek(entry.offset, LhaArrayReader.SeekAbsolute);
     var writer = new LhaArrayWriter(entry.originalSize);
+
     while (this.extractBlock(writer)) {
         if (callback)
             callback(writer.offset, writer.size);
         if (writer.offset >= writer.size)
             break;
     }
-    return buffer;
+    return writer.data;
 };
 
 LhaReader.prototype.extractBlock = function(writer) {
@@ -330,5 +333,8 @@ LhaReader.prototype.extractBlock = function(writer) {
     return true;
 };
 
-module.exports = exports = LhaReader;
+module.exports = exports = {
+    LhaReader: LhaReader,
+    LhaArrayReader: LhaArrayReader
+};
 
