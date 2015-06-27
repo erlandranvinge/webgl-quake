@@ -2,11 +2,42 @@
 body {
     margin: 0;
     padding: 0;
-    background: #fff;
+    background: #000;
 }
 
 canvas {
     /*cursor: none;*/
     width: 50%;
     height: 50%;
+}
+
+#dialog {
+    display:block;
+    border: 2px solid white;
+    background:blue;
+    width:400px;
+    height:200px;
+    position:absolute;
+    left:50%;
+    top:50%;
+    margin:-100px 0 0 -200px;
+    text-align: center;
+}
+
+#dialog p {
+    margin-top: 40px;
+    font-family: OpenSans, Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    color: #fff;
+}
+
+#dialog button {
+    margin-top: 30px;
+    background: #000;
+    width: 100px;
+    height: 40px;
+    color:#fff;
+    font-family: OpenSans, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
 }

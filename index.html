@@ -10,9 +10,15 @@
     <canvas id='canvas' width="640" height="480">
         Quake (webgl) require the HTML5 <code>&lt;canvas&gt;</code> element.
     </canvas>
+    <div id="dialog">
+        <p></p>
+        <button>Cancel</button>
+    </div>
     <script>
         var quake = new Quake();
-        quake.start();
+        quake.install(function() {
+            quake.start();
+        });
     </script>
 </body>
 </html>

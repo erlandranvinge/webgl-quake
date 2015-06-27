@@ -80,9 +80,14 @@ Quake.prototype.handleInput = function() {
     */
 };
 
+Quake.prototype.install = function(done) {
+    installer.start(function() {
+
+    });
+};
+
 Quake.prototype.start = function() {
 
-    installer.start('http://www.gamers.org/pub/games/quake/idstuff/quake/quake106.zip');
 
     /*
     Quake.instance = this;
