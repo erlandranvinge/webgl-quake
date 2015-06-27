@@ -1,7 +1,6 @@
 var Dialog = require('installer/dialog');
 var zip = require('lib/zip.js').zip;
 var Lh4 = require('lib/lh4.js');
-var File = require('file');
 var assets = require('assets');
 
 var Installer = function() {
@@ -9,9 +8,9 @@ var Installer = function() {
     this.isLocal = window.location.hostname.indexOf('localhost') !== -1;
 };
 
-Installer.localUrl = 'data/quake106.zip';
+Installer.localUrl = 'data/pak0.pak'; //''data/quake106.zip';
 Installer.crossOriginProxyUrl = 'http://crossorigin.me/';
-Installer.mirrors = [
+Installer.mirrors = [ // TODO: Add more valid quake shareware mirrors.
     'http://www.gamers.org/pub/games/quake/idstuff/quake/quake106.zip'
 ];
 
@@ -24,6 +23,7 @@ Installer.prototype.download = function(done) {
     var url = this.isLocal ?
         Installer.localUrl :
         Installer.crossOriginProxyUrl + Installer.mirrors[0];
+    var unpacked = url.indexOf('pak') !== -1;
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -37,7 +37,12 @@ Installer.prototype.download = function(done) {
 
     xhr.onload = function(e) {
         if (this.status === 200) {
-            self.unpack(this.response, done);
+
+            if (!unpacked) {
+                self.unpack(this.response, done);
+            } else {
+                self.finalize(new Uint8Array(this.response), done);
+            }
         } else {
             self.error('Download failed. Try again.');
         }
@@ -62,13 +67,17 @@ Installer.prototype.unpack = function(response, done) {
                 self.dialog.setCaption('Extracting lha resources...');
                 var lha = new Lh4.LhaReader(new Lh4.LhaArrayReader(buffer));
                 var data = lha.extract(3);
-                assets.setPak(data);
-                self.dialog.setCaption('Starting up Quake...');
-                self.dialog.hide();
-                done();
+                self.finalize(data, done);
             });
         });
     });
+};
+
+Installer.prototype.finalize = function(data, done) {
+    assets.setPak(data);
+    this.dialog.setCaption('Starting up Quake...');
+    this.dialog.hide();
+    done();
 };
 
 Installer.prototype.start = function(done) {

@@ -20,7 +20,6 @@ var Pak = function(data) {
         this.index[path] = { offset: offset, size: size };
     }
     console.log('PAK: Loaded %i entries.', indexFileCount);
-
     this.file = file;
 };
 
