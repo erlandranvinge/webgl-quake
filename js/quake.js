@@ -92,7 +92,7 @@ Quake.prototype.start = function() {
             self.statusBar = new StatusBar();
             self.input = new Input();
             self.client = new Client();
-            self.client.playDemo('demo2.dem');
+            self.client.playDemo('demo1.dem');
             tick();
         });
     });
