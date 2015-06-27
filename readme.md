@@ -9,8 +9,7 @@ I use GitHub pages to host a demo of the current progress. The test application 
 
 [Quake WebGL demo](http://erlandranvinge.github.io/webgl-quake/)
 
-### Get started:
-If you want to browser and/or build the source code to run locally; follow the steps below:
+### Getting started with the code:
 1. Clone the repository.  
 2. Place the PAK data files (e.g. PAK0.pak or similar depending on quake version)  in the data folder.  
 3. Start the game using node/gulp with the commands listed below:  
