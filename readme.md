@@ -9,6 +9,8 @@ I use GitHub pages to host a demo of the current progress. The test application 
 
 [Quake WebGL demo](http://erlandranvinge.github.io/webgl-quake/)
 
+Tested in FF, Chrome, Safari, Mobile Safari.
+
 ### Getting started with the code:
 1. Make sure you have node/npm readily available. 
 2. Clone the repository.  
