@@ -22,6 +22,7 @@ Client.prototype.readFromServer = function() {
 
     var angles = [demo.readFloat(), demo.readFloat(), demo.readFloat()];
     if (this.viewEntity !== -1) {
+        console.log(angles);
         //var entity = this.entities[this.viewEntity];
         //vec3.set(entity.state.angles, angles[0], angles[1], angles[1]);
     }
@@ -202,7 +203,8 @@ Client.prototype.parseFastUpdate = function(cmd, msg) {
 
     // TODO: Move entity fast updates into world.js.
     var entity = this.world.entities[entityNo];
-    entity.time = this.serverTime;
+    entity.time = this.time.serverTime;
+
 
     if (cmd & Protocol.fastUpdateModel) {
         entity.state.modelIndex = msg.readUInt8();

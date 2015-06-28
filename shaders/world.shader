@@ -25,7 +25,7 @@
     const float brightness = 1.4;
     void main(void) {
 
-        float intensity = 1.0 - texture2D(lightMap, shadowTexCoords.xy).x;
+        float intensity = 1.5 - texture2D(lightMap, shadowTexCoords.xy).x;
         gl_FragColor = vec4(texture2D(textureMap, texCoords).xyz * intensity, 1.0) * brightness;
     }
 
