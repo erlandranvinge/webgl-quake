@@ -21,8 +21,10 @@ if (!window.requestFrame) {
 }
 
 Quake = function() {};
+var ticks = 100;
 
 var tick = function(time) {
+    if (ticks-- < 0) return;
     requestFrame(tick);
     Quake.instance.tick(time);
 };

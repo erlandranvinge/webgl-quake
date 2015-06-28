@@ -41,23 +41,21 @@ LhaArrayReader.prototype.readUInt16 = function() {
         return -1;
     var value =
         (this.buffer[this.offset] & 0xFF) |
-            ((this.buffer[this.offset+1] << 8) & 0xFF00);
+        ((this.buffer[this.offset+1] << 8) & 0xFF00);
     this.offset += 2;
     return value;
 };
-
 LhaArrayReader.prototype.readUInt32 = function() {
     if (this.offset + 4 >= this.buffer.length)
         return -1;
     var value =
         (this.buffer[this.offset] & 0xFF) |
-            ((this.buffer[this.offset+1] << 8) & 0xFF00) |
-            ((this.buffer[this.offset+2] << 16) & 0xFF0000) |
-            ((this.buffer[this.offset+3] << 24) & 0xFF000000);
+        ((this.buffer[this.offset+1] << 8) & 0xFF00) |
+        ((this.buffer[this.offset+2] << 16) & 0xFF0000) |
+        ((this.buffer[this.offset+3] << 24) & 0xFF000000);
     this.offset += 4;
     return value;
 };
-
 LhaArrayReader.prototype.readString = function(size) {
     if (this.offset + size >= this.buffer.length)
         return -1;
@@ -113,7 +111,6 @@ LhaTree.prototype.setConstant = function(code) {
 };
 
 LhaTree.prototype.expand = function() {
-    var newNodes = (this.allocated - this.nextEntry) * 2;
     var endOffset = this.allocated;
     while (this.nextEntry < endOffset) {
         this.tree[this.nextEntry] = this.allocated;
@@ -185,7 +182,7 @@ var LhaReader = function(reader) {
     this.offsetTree = new LhaTree();
     this.codeTree = new LhaTree();
     this.ringBuffer = new LhaRingBuffer(1 << 13); // lh4 specific.
-    this.entries = [];
+    this.entries = {};
 
     if (reader.readString(2) == 'MZ') { // Check for SFX header, and skip it if it exists.
         var lastBlockSize = reader.readUInt16();
@@ -209,10 +206,10 @@ var LhaReader = function(reader) {
         header.datetime = reader.readUInt32();
         header.attributes = reader.readUInt16();
         var filenameSize = reader.readUInt8();
-        header.filename = reader.readString(filenameSize);
+        header.filename = reader.readString(filenameSize).toLowerCase();
         header.crc = reader.readUInt16();
         header.offset = reader.getPosition();
-        this.entries.push(header);
+        this.entries[header.filename] = header;
         reader.seek(header.packedSize, LhaArrayReader.SeekRelative);
     }
 };
@@ -276,7 +273,6 @@ LhaReader.prototype.readOffsetTable = function() {
     if (codeCount <= 0) {
         var constant = reader.readBits(4);
         this.offsetTree.setConstant(constant);
-        return;
     } else {
         var codeLengths = [];
         for (var i = 0; i < codeCount; i++) {
@@ -287,17 +283,25 @@ LhaReader.prototype.readOffsetTable = function() {
     }
 };
 
-LhaReader.prototype.extract = function(id, callback) {
+LhaReader.prototype.extract = function(id, callback, onerror) {
     var entry = this.entries[id];
+    if (!entry)
+        return null;
+
     this.reader.seek(entry.offset, LhaArrayReader.SeekAbsolute);
     var writer = new LhaArrayWriter(entry.originalSize);
+    var that = this;
+    function step() { // This step solution was borrowed from ZIP-lib to prevent browser script timeout warnings.
+        if (that.extractBlock(writer)) {
+            if (callback)
+                callback(writer.offset, writer.size);
+            if (writer.offset >= writer.size)
+                return;
 
-    while (this.extractBlock(writer)) {
-        if (callback)
-            callback(writer.offset, writer.size);
-        if (writer.offset >= writer.size)
-            break;
+            setTimeout(step, 1);
+        }
     }
+    step();
     return writer.data;
 };
 
@@ -332,9 +336,3 @@ LhaReader.prototype.extractBlock = function(writer) {
     }
     return true;
 };
-
-module.exports = exports = {
-    LhaReader: LhaReader,
-    LhaArrayReader: LhaArrayReader
-};
-

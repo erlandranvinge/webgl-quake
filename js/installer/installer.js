@@ -33,6 +33,7 @@ Installer.prototype.download = function(done) {
     var self = this;
     xhr.onreadystatechange = function() {
         self.dialog.setCaption('Download completed. Processing file...', this.readyState);
+        xhr.onreadystatechange = null;
     };
 
     xhr.onload = function(e) {
