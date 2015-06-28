@@ -22,9 +22,8 @@ Client.prototype.readFromServer = function() {
 
     var angles = [demo.readFloat(), demo.readFloat(), demo.readFloat()];
     if (this.viewEntity !== -1) {
-        console.log(angles);
-        //var entity = this.entities[this.viewEntity];
-        //vec3.set(entity.state.angles, angles[0], angles[1], angles[1]);
+        var ve = this.world.entities[this.viewEntity];
+        vec3.set(ve.state.angles, angles[0], angles[1], angles[2]);
     }
 
     var msg = demo.read(messageSize);
