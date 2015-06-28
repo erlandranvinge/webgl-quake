@@ -11,7 +11,7 @@ I use GitHub pages to host a demo of the current progress. The test application 
 
 Tested in FF, Chrome, Safari, Mobile Safari.
 
-### Getting started with the code:
+### Getting started with the code
 1. Make sure you have node/npm readily available. 
 2. Clone the repository.  
 3. Place the PAK data files (e.g. PAK0.pak or similar depending on quake version)  in the data folder.  
