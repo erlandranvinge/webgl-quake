@@ -31,6 +31,7 @@ var tick = function(time) {
 
 Quake.prototype.tick = function(time) {
 
+    this.console.update(time);
     this.client.update(time);
     this.handleInput();
 
@@ -45,12 +46,16 @@ Quake.prototype.tick = function(time) {
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.BLEND);
     this.statusBar.draw(this.ortho);
+    this.console.draw(this.ortho);
+
 };
 
 // Temp. controller.
 Quake.prototype.handleInput = function() {
     if (this.client.viewEntity === -1)
         return;
+
+
 
     /*
     var angle = utils.deg2Rad(this.client.viewAngles[1]);
@@ -91,8 +96,8 @@ Quake.prototype.start = function() {
         assets.add('shaders/world.shader');
         assets.precache(function() {
             self.console = new Console();
+            self.input = new Input(self.console);
             self.statusBar = new StatusBar();
-            self.input = new Input();
             self.client = new Client();
             self.client.playDemo('demo1.dem');
             tick();

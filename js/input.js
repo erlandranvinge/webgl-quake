@@ -1,17 +1,18 @@
 
 var keys = { left: 37, right: 39, up: 38, down: 40, a: 65, z: 90 };
 
-var Input = function() {
+var Input = function(console) {
     this.left = false;
     this.right = false;
     this.up = false;
     this.down = false;
     this.flyUp = false;
     this.flyDown = false;
-
     var self = this;
-    document.addEventListener('keydown',
-        function(event) { self.keyDown(event); }, true);
+    document.addEventListener('keydown', function(event) {
+        console.input(event.keyCode);
+        self.keyDown(event);
+    }, true);
     document.addEventListener('keyup',
         function(event) { self.keyUp(event); }, true);
 };
