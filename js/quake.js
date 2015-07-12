@@ -1,11 +1,11 @@
 
 var webgl = require('gl/gl');
-var assets = require('assets');
-var installer = require('installer/installer');
 var Input = require('input');
-var Console = require('ui/console');
 var StatusBar = require('ui/statusbar');
 var Client = require('client');
+var assets = require('assets');
+var con = require('ui/console');
+var installer = require('installer/installer');
 
 if (!window.requestFrame) {
     window.requestFrame = ( function() {
@@ -31,7 +31,7 @@ var tick = function(time) {
 
 Quake.prototype.tick = function(time) {
 
-    this.console.update(time);
+    con.update(time);
     this.client.update(time);
     this.handleInput();
 
@@ -46,8 +46,7 @@ Quake.prototype.tick = function(time) {
     gl.disable(gl.CULL_FACE);
     gl.enable(gl.BLEND);
     this.statusBar.draw(this.ortho);
-    this.console.draw(this.ortho);
-
+    con.draw(this.ortho);
 };
 
 // Temp. controller.
@@ -95,8 +94,8 @@ Quake.prototype.start = function() {
         assets.add('shaders/texture2d.shader');
         assets.add('shaders/world.shader');
         assets.precache(function() {
-            self.console = new Console();
-            self.input = new Input(self.console);
+            con.init();
+            self.input = new Input();
             self.statusBar = new StatusBar();
             self.client = new Client();
             self.client.playDemo('demo1.dem');

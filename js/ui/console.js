@@ -4,7 +4,9 @@ var Font = require('gl/font');
 var assets = require('assets');
 var settings = require('settings');
 
-var Console = function() {
+var Console = function() {};
+
+Console.prototype.init = function() {
    var fontTexture = assets.load('wad/CONCHARS', { width: 128, height: 128, alpha: true });
    var font = new Font(fontTexture, 8, 8);
 
@@ -25,14 +27,18 @@ var Console = function() {
 
    this.font = font;
    this.enabled = true;
-   this.height = 0;
-   this.lines = [];
-   this.line = '> ';
-
+   this.dirty = false;
+   this.y = -gl.height * 0.75;
+   this.lines = [''];
+   this.line = ']';
 };
 
 Console.prototype.print = function(msg) {
-   this.font.drawString(40, 40, msg);
+   if (msg.indexOf('\n') !== -1)
+      this.lines.push('');
+   else
+      this.lines[this.lines.length - 1] += msg;
+   this.dirty = true;
 };
 
 Console.prototype.input = function(key) {
@@ -42,8 +48,8 @@ Console.prototype.input = function(key) {
          break;
       case 13:
          this.lines.push(this.line);
-         this.line = '> ';
-         this.redrawBuffer();
+         this.line = ']';
+         this.dirty = true;
          break;
       default:
          this.line += String.fromCharCode(key);
@@ -75,17 +81,20 @@ Console.prototype.draw = function(p) {
    if (!this.enabled)
       return;
 
+   if (this.dirty)
+      this.redrawBuffer();
+
    gl.enable(gl.BLEND);
    this.background.clear();
-   this.background.drawSprite(0, 0, this.height, gl.width, gl.height, 1, 1, 1, 1);
+   this.background.drawSprite(0, 0, this.y, gl.width, gl.height, 1, 1, 1, 1);
    this.background.render(assets.shaders.color2d, p);
 
    this.buffer.clear();
-   this.buffer.drawSprite(0, 0, this.height, gl.width, gl.height, 1, 1, 1, 1);
+   this.buffer.drawSprite(0, 0, this.y, gl.width, gl.height, 1, 1, 1, 1);
    this.buffer.render(assets.shaders.color2d, p);
 
-   this.font.drawString(8, gl.height - 30, this.line);
+   this.font.drawString(8, this.y + gl.height - 30, this.line);
    this.font.render(assets.shaders.texture2d, p);
 };
 
-module.exports = exports = Console;
+module.exports = exports = new Console();

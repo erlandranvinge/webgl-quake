@@ -67,8 +67,8 @@ Assets.prototype.load = function(name, options) {
     var index = name.indexOf('/');
     var location = name.substr(0, index);
     var type = utils.getExtension(name) || 'texture';
-    var name = name.substr(index + 1);
-    var options = options || {};
+    name = name.substr(index + 1);
+    options = options || {};
 
     switch (type) {
         case 'bsp':

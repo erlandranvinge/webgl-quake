@@ -1,3 +1,4 @@
+var con = require('ui/console');
 
 var keys = { left: 37, right: 39, up: 38, down: 40, a: 65, z: 90 };
 
@@ -10,7 +11,7 @@ var Input = function(console) {
     this.flyDown = false;
     var self = this;
     document.addEventListener('keydown', function(event) {
-        console.input(event.keyCode);
+        con.input(event.keyCode);
         self.keyDown(event);
     }, true);
     document.addEventListener('keyup',
