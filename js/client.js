@@ -1,4 +1,5 @@
 var assets = require('assets');
+var con = require('ui/console');
 var Protocol = require('protocol');
 var World = require('world');
 
@@ -60,7 +61,7 @@ Client.prototype.readFromServer = function() {
                 this.parseSound(msg);
                 break;
             case Protocol.serverPrint:
-                console.log(msg.readCString());
+                con.print(msg.readCString());
                 break;
             case Protocol.serverLightStyle:
                 var style = msg.readUInt8();
@@ -85,7 +86,7 @@ Client.prototype.readFromServer = function() {
                 this.parseParticle(msg);
                 break;
             case Protocol.serverStuffText:
-                console.log(msg.readCString());
+                console.log('serverStuffText: ' + msg.readCString());
                 break;
             case Protocol.serverTempEntity:
                 this.parseTempEntity(msg);
@@ -113,7 +114,7 @@ Client.prototype.readFromServer = function() {
                 this.world.spawnEntity(msg.readInt16(), this.parseBaseline(msg));
                 break;
             case Protocol.serverCenterPrint:
-                console.log('CENTER: ', msg.readCString());
+                con.print('CENTER: ' + msg.readCString());
                 break;
             case Protocol.serverSpawnStaticSound:
                 msg.skip(9);

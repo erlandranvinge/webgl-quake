@@ -27,6 +27,7 @@ World.prototype.loadModel = function(name) {
             var model = new Map(assets.load('pak/' + name));
             this.models.push(model);
             if (!this.map) { this.map = model; }
+            console.log(name);
             break;
         case 'mdl':
             this.models.push(new Model(assets.load('pak/' + name)));
