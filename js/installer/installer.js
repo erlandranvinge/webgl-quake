@@ -10,9 +10,9 @@ var Installer = function() {
 };
 
 Installer.localUrl = 'data/quake106.zip';
-Installer.crossOriginProxyUrl = 'http://crossorigin.me/';
+Installer.crossOriginProxyUrl = 'http://crossorigin.herokuapp.com/';
 Installer.mirrors = [
-    'http://www.gamers.org/pub/games/quake/idstuff/quake/quake106.zip'
+    'http://ftp.mancubus.net/pub/idgames/idstuff/quake/quake106.zip'
 ];
 
 Installer.prototype.error = function(message) {
