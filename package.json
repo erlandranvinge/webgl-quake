@@ -5,8 +5,11 @@
   "dependencies": {
     "gulp": "^4.0.2",
     "gulp-browserify": "^0.5.1",
-    "gulp-connect": "^5.7.0",
-    "gulp-watch": "^5.0.1"
+    "gulp-connect": "^5.7.0"
+  },
+  "scripts": {
+    "dev": "gulp dev",
+    "build": "gulp build"
   },
   "author": "Erland Ranvinge",
   "license": "MIT"

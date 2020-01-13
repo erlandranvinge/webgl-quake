@@ -283,25 +283,21 @@ LhaReader.prototype.readOffsetTable = function() {
     }
 };
 
-LhaReader.prototype.extract = function(id, callback, onerror) {
+LhaReader.prototype.extract = function(id, callback) {
     var entry = this.entries[id];
     if (!entry)
         return null;
 
     this.reader.seek(entry.offset, LhaArrayReader.SeekAbsolute);
+    
     var writer = new LhaArrayWriter(entry.originalSize);
-    var that = this;
-    function step() { // This step solution was borrowed from ZIP-lib to prevent browser script timeout warnings.
-        if (that.extractBlock(writer)) {
-            if (callback)
-                callback(writer.offset, writer.size);
-            if (writer.offset >= writer.size)
-                return;
 
-            setTimeout(step, 1);
-        }
+    while(true) {
+        if (!this.extractBlock(writer))
+            break;
+        if (writer.offset >= writer.size)
+            break;;
     }
-    step();
     return writer.data;
 };
 
@@ -336,3 +332,8 @@ LhaReader.prototype.extractBlock = function(writer) {
     }
     return true;
 };
+
+module.exports = exports = {
+    'LhaArrayReader': LhaArrayReader,
+    'LhaReader': LhaReader
+}

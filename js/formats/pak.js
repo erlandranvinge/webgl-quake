@@ -10,8 +10,8 @@ var Pak = function(data) {
 
     var indexOffset = file.readUInt32();
     var indexFileCount = file.readUInt32() / 64;
-
     file.seek(indexOffset);
+    
     this.index = {};
     for (var i = 0; i < indexFileCount; i++) {
         var path = file.readString(56);
