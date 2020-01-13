@@ -5,7 +5,7 @@ var assets = require('assets');
 
 var Installer = function() {
     this.dialog = new Dialog('dialog');
-    this.isLocal = window.location.hostname.indexOf('localhost') !== -1;
+    this.isLocal = false;//window.location.hostname.indexOf('localhost') !== -1;
 };
 
 Installer.localUrl = 'data/pak0.pak'; //''data/quake106.zip';
