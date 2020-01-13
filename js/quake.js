@@ -53,7 +53,7 @@ Quake.prototype.tick = function(time) {
 Quake.prototype.handleInput = function() {
     if (this.client.viewEntity === -1)
         return;
-
+    
 
 
     /*
